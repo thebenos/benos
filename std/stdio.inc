@@ -37,7 +37,7 @@ read:
     cmp al, 0x08        ; Backspace pressed?
     je .backspace
 
-    stosb               ; Store character in al
+    stosb
 
     ; Write the character
     mov ah, 0x0e
@@ -45,14 +45,31 @@ read:
 
     jmp .begin          ; Go to the next character
 .backspace:
-    
+    cmp di, 0
+    je .begin
+
+    dec di
+
+    mov ah, 0x0e
+
+    mov al, 0x08
+    int 0x10
+    mov al, ' '
+    int 0x10
+    mov al, 0x08
+    int 0x10
+
+    jmp .begin
+.restore:
+    pop cx
+    jmp .begin
 .newline:
     ; Add a newline when ENTER is pressed
-    mov al, 0x0a        ; Line feed
-    mov ah, 0x0e        ; BIOS service for character output
-    int 0x10             ; Print the line feed
+    mov al, 0x0a         ; Line feed
+    mov ah, 0x0e
+    int 0x10
     mov al, 0x0d         ; Carriage return
-    int 0x10             ; Print the carriage return
+    int 0x10
 
     mov al, 0
     stosb

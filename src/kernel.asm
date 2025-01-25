@@ -1,8 +1,6 @@
 [BITS 16]               ; Real mode
 [ORG 0x0]
 
-%define BOOTLOADER
-
 jmp start
 
 %macro check_command 3
@@ -104,19 +102,19 @@ shell_loop:
     sti
 
 ; SECTION -- Variables
-kernelStarted db "Kernel started!", 13, 10, 0
+kernelStarted       db      "Kernel started!", 13, 10, 0
 
-message_info db "BenOS is a 16-bits operating system developped by Wither__", 13, 10, 0
-message_help db "Commands:", 13, 10, 'help echo info version halt reboot', 13, 10, 0
-message_version db "0.1.0", 13, 10, 0
-message_error db "Invalid command.", 13, 10, 0
+message_info        db      "BenOS is a 16-bits operating system developped by Wither__", 13, 10, 0
+message_help        db      "Commands:", 13, 10, 'help echo info version halt reboot', 13, 10, 0
+message_version     db      "0.1.1", 13, 10, 0
+message_error       db      "Invalid command.", 13, 10, 0
 
-cmdBuffer times 255 db 0
-prompt db "BenOS> ", 0
+cmdBuffer times 255 db      0
+prompt              db      "BenOS> ", 0
 
-command_echo db 'echo',         0
-command_info db 'info',         0
-command_help db 'help',         0
-command_version db 'version',   0
-command_halt db 'halt',         0
-command_reboot db 'reboot',     0
+command_echo        db      'echo', 0
+command_info        db      'info', 0
+command_help        db      'help', 0
+command_version     db      'version', 0
+command_halt        db      'halt', 0
+command_reboot      db      'reboot', 0
