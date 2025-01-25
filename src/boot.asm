@@ -6,6 +6,7 @@
 
 jmp start
 %include "std/stdio.inc"
+%include "std/disk.inc"
 
 start:
     ; Segments initialization
@@ -28,6 +29,7 @@ start:
     ; Load the kernel
     xor ax, ax
     int 0x13
+    jc disk_error
 
     push es
     mov ax, BASE
@@ -41,6 +43,7 @@ start:
     mov dh, 0
     mov dl, [bootdrv]
     int 0x13
+    jc disk_error
     pop es
 
     ; Jump to the kernel
@@ -48,9 +51,8 @@ start:
 
 ; SECTION -- Variables
 title db "BenOS", 13, 10, '=====', 13, 10, 0
-info db "Bootloader started in 16 bits (real mode)", 13, 10, 0
+info db "Bootloader started!", 13, 10, 0
 loadKernel db "Loading kernel...", 13, 10, 0
-loadFAT db "Initializing filesystem..."
 bootdrv db 0
 
 ; Boot signature
