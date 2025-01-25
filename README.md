@@ -57,6 +57,9 @@ Version 0.1.0:
 --> stdio.inc (print, read, clear_screen)
 --> string.inc (strcmp, compare_start_strings, tokenize_string, length_string)
 
+  ## Links
+  https://discord.gg/uYzHw6bU (Discord server)
+
 Version 0.1.1:
 - Removed useless constant in [src/kernel.asm](src/kernel.asm)
 - Added 'disk.inc' to the standard library with 'disk_error'
