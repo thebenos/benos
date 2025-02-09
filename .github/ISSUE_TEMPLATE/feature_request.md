@@ -1,7 +1,7 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
+about: Suggest an idea to improve BenOS!
+title: FEATURE REQUEST
 labels: ''
 assignees: ''
 
