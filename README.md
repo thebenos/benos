@@ -43,8 +43,11 @@ qemu-system-x86_64 -drive format=raw,file=benos
 ## Versions history
 Here is the list of all the versions and their features:
 
-##### Version 0.0:
+##### Version 0.0.0:
 - First version
+#### Version 0.0.1:
+- Improved the bootloader to initialize the filesystem (FAT12)
+- Added "DISK_read" and "DISK_write" in "lib/disk.asm"
 
 ## Links
 Join our official Discord server: https://discord.gg/AJjmXgXy
