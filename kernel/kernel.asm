@@ -1,11 +1,9 @@
 [bits 16]
 [org 0x0]
 
-jmp start
-
 start:
 ; Initialize segments
-    mov ax, 0x100
+    mov ax, 0x1000
     mov ds, ax
     mov es, ax
     mov ax, 0x8000

@@ -8,7 +8,7 @@ echo "----- STARTING BUILD -----"
 
 echo "Compiling "boot/bootloader.asm"..."
 nasm -f bin -o build/bootloader.bin boot/bootloader.asm
-echo "Compiling "kernel/kernel.asm"..."
+echo "Compiling "kernel.kernel.asm"..."
 nasm -f bin -o build/kernel.bin kernel/kernel.asm
 
 echo "Creating disk image.."
