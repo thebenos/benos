@@ -1,3 +1,5 @@
+; This file contains several subroutines used to interact with the disk.
+
 [bits 16]
 
 ; Usage:
