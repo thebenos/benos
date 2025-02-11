@@ -24,19 +24,19 @@ start:
     mov sp, 0xf000
 
     mov si, segInit
-    call STDIO_print
+    call BOOT_UTILS_print
 
 ; Recover boot unit
     mov dl, [boot_driver]
 
     mov si, recBootUnit
-    call STDIO_print
+    call BOOT_UTILS_print
     ; Error servicing hardware: INT 0x8
 
 ; Load bootsector
     xor ax, ax
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
 
     push es
     mov ax, BASE
@@ -50,16 +50,16 @@ start:
     mov dh, 0
     mov dl, [boot_driver]
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
     pop es
 
     mov si, bsLoaded
-    call STDIO_print
+    call BOOT_UTILS_print
 
 ; Load FAT
     xor ax, ax
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
 
     push es
     mov ax, BASE
@@ -73,16 +73,16 @@ start:
     mov dh, 0
     mov dl, [boot_driver]
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
     pop es
 
     mov si, fatLoaded
-    call STDIO_print
+    call BOOT_UTILS_print
 
 ; Load root directory
     xor ax, ax
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
 
     push es
     mov ax, BASE
@@ -96,11 +96,11 @@ start:
     mov dh, 0
     mov dl, [boot_driver]
     int 0x13
-    jc DISK_error
+    jc BOOT_UTILS_disk_error
     pop es
 
     mov si, rootdirLoaded
-    call STDIO_print
+    call BOOT_UTILS_print
 
 ; Load the kernel
 ;
@@ -125,17 +125,16 @@ start:
     pop es
 
     mov si, krnReady
-    call STDIO_print
+    call BOOT_UTILS_print
 
 ; Jump to the kernel
     mov si, krnLoading
-    call STDIO_print
+    call BOOT_UTILS_print
 
     jmp BASE:0
 
 ; ----- INCLUDES -----
-%include "lib/stdio.asm"
-%include "lib/disk.asm"
+%include "boot/utils.asm"
 
 ; ----- DATA -----
 ; Messages
