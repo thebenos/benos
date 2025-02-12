@@ -7,7 +7,7 @@ BenOS is a small, free and open-source operating system still in active developm
 ## Why should you use BenOS?
 What a stupid question... you shouldn't lol!
 Explanation:
-BenOS don't have a lot of features for now, but I am working hard to improve it, and you can contribute [here](CONTRIBUTING.md)!
+BenOS does not have a lot of features for now, but I am working hard to improve it, and you can contribute [here](CONTRIBUTING.md)!
 But you can always try it and suggest improvements.
 
 ## Build
