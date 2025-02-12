@@ -31,82 +31,8 @@ start:
 
     mov si, recBootUnit
     call BOOT_UTILS_print
-    ; Error servicing hardware: INT 0x8
-
-; Load bootsector
-    xor ax, ax
-    int 0x13
-    jc BOOT_UTILS_disk_error
-
-    push es
-    mov ax, BASE
-    mov es, ax
-    mov bx, 0
-
-    mov ah, 0x02
-    mov al, 1
-    mov ch, 0
-    mov cl, 2
-    mov dh, 0
-    mov dl, [boot_driver]
-    int 0x13
-    jc BOOT_UTILS_disk_error
-    pop es
-
-    mov si, bsLoaded
-    call BOOT_UTILS_print
-
-; Load FAT
-    xor ax, ax
-    int 0x13
-    jc BOOT_UTILS_disk_error
-
-    push es
-    mov ax, BASE
-    mov es, ax
-    mov bx, 0
-
-    mov ah, 0x02
-    mov al, 9
-    mov ch, 0
-    mov cl, 3
-    mov dh, 0
-    mov dl, [boot_driver]
-    int 0x13
-    jc BOOT_UTILS_disk_error
-    pop es
-
-    mov si, fatLoaded
-    call BOOT_UTILS_print
-
-; Load root directory
-    xor ax, ax
-    int 0x13
-    jc BOOT_UTILS_disk_error
-
-    push es
-    mov ax, BASE
-    mov es, ax
-    mov bx, 0
-
-    mov ah, 0x02
-    mov al, 14
-    mov ch, 0
-    mov cl, 19
-    mov dh, 0
-    mov dl, [boot_driver]
-    int 0x13
-    jc BOOT_UTILS_disk_error
-    pop es
-
-    mov si, rootdirLoaded
-    call BOOT_UTILS_print
 
 ; Load the kernel
-;
-; NOTE: the kernel is not represented as a file into the operating system,
-; so the bootloader directly loads the sectors.
-; This means that you cannot access to the kernel when using the filesystem.
     xor ax, ax
     int 0x13
 
@@ -142,9 +68,6 @@ segInit:            db      "[OK] Segments initialized", 13, 10, 0
 recBootUnit:        db      "[OK] Recovered boot unit", 13, 10, 0
 krnReady:           db      "[OK] Kernel is ready", 13, 10, 0
 krnLoading:         db      "[-] Jumping to the kernel...", 13, 10, 0
-bsLoaded:           db      "[OK] Loaded boot sector", 13, 10, 0
-fatLoaded:          db      "[OK] Loaded FAT", 13, 10, 0
-rootdirLoaded:      db      "[OK] Loaded root directory", 13, 10, 0
 
 boot_driver:        db      0x80        ; Hard disk
 

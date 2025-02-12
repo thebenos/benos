@@ -22,7 +22,8 @@ BOOT_UTILS_print:
 ; int 0x13
 ; jc BOOT_UTILS_disk_error
 BOOT_UTILS_disk_error:
-    mov ah, 0x0e
-    mov al, '!'
-    int 0x10
+    mov si, .msg
+    call BOOT_UTILS_print
     jmp $
+
+    .msg: db "[!] An error occured while operating on disk", 13, 10, 0
