@@ -3,7 +3,7 @@
 
 [bits 16]
 
-STDIO_newline         db      13, 10, 0
+NEWLINE:         db      13, 10, 0
 
 ; Usage:
 ; mov al, <char>

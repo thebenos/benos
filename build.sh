@@ -12,7 +12,7 @@ echo "Compiling "kernel.kernel.asm"..."
 nasm -f bin -o build/kernel.bin kernel/kernel.asm
 
 echo "Creating disk image.."
-cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880
+cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880 iflag=fullblock
 
 rm -r build
 
