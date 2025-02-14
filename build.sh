@@ -1,19 +1,18 @@
 #!/bin/bash
 
+trap "rm -r build" EXIT
 set -e
 
 mkdir build
 
 echo "----- STARTING BUILD -----"
 
-echo "Compiling "boot/bootloader.asm"..."
-nasm -f bin -o build/bootloader.bin boot/bootloader.asm
-echo "Compiling "kernel.kernel.asm"..."
-nasm -f bin -o build/kernel.bin kernel/kernel.asm
+echo "Compiling "boot/boot.asm"..."
+nasm -f bin -o build/BOOT.BIN boot/boot.asm
+echo "Compiling "kernel/kernel.asm"..."
+nasm -f bin -o build/KERNEL.BIN kernel/kernel.asm
 
-echo "Creating disk image.."
-cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880 iflag=fullblock
-
-rm -r build
+mformat -f1440 -B build/BOOT.BIN -C -i benos.img
+mcopy -D o -i benos.img build/KERNEL.BIN ::/
 
 echo "----- BUILD COMPLETE -----"
