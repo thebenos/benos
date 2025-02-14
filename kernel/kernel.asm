@@ -78,6 +78,12 @@ shell_begin:
 
     check_command cmdHalt, STRING_compare, .command_halt
 
+    check_command cmdLs, STRING_compare, .command_ls
+    check_command cmdCat, STRING_compare, .command_cat
+    check_command cmdRm, STRING_compare, .command_rm
+    check_command cmdMv, STRING_compare, .command_mv
+    check_command cmdTouch, STRING_compare, .command_touch
+
     jmp .command_unknow
 
     .command_unknow:
@@ -153,6 +159,7 @@ shell_begin:
 %include "lib/string.asm"
 %include "lib/disk.asm"
 %include "lib/general.asm"
+%include "lib/filesystem.asm"
 
 ; ----- DATA -----
 segInit:            db      "[OK] Segments initialized", 13, 10, 0
@@ -170,6 +177,11 @@ cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
+cmdLs      db "ls", 0
+cmdCat     db "cat", 0
+cmdRm      db "rm", 0
+cmdMv      db "mv", 0
+cmdTouch   db "touch", 0
 
 ; Commands arguments
 cmdInfo_version:    db      "info -v", 0
@@ -199,3 +211,19 @@ msgHelp_halt:
     db "HALT -- Available options:", 13, 10
     db "No option is available for now", 13, 10
     db 0
+
+msgFileNotFound:
+    db "File not found", 13, 10, 0
+    
+msgDiskError:
+    db "Disk error", 13, 10, 0
+
+msgFileCreated:
+    db "File created", 13, 10, 0
+
+msgFileDeleted:
+    db "File deleted", 13, 10, 0
+
+msgFileRenamed:
+    db "File renamed", 13, 10, 0
+    
