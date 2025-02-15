@@ -80,6 +80,12 @@ shell_begin:
 
     check_command cmdHalt, STRING_compare, command_halt
 
+    check_command cmdLs, STRING_compare, .command_ls
+    check_command cmdCat, STRING_compare, .command_cat
+    check_command cmdRm, STRING_compare, .command_rm
+    check_command cmdMv, STRING_compare, .command_mv
+    check_command cmdTouch, STRING_compare, .command_touch
+
     jmp .command_unknow
 
     .command_unknow:
@@ -111,6 +117,7 @@ shell_begin:
 %include "lib/string.asm"
 %include "lib/disk.asm"
 %include "lib/general.asm"
+%include "lib/filesystem.asm"
 
 %include "kernel/help.asm"
 %include "kernel/info.asm"
@@ -132,6 +139,11 @@ cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
+cmdLs      db "ls", 0
+cmdCat     db "cat", 0
+cmdRm      db "rm", 0
+cmdMv      db "mv", 0
+cmdTouch   db "touch", 0
 
 ; Commands arguments
 cmdInfo_version:    db      "info -v", 0
@@ -141,4 +153,41 @@ cmdHelp_info        db      "help info", 0
 cmdHelp_halt        db      "help halt", 0
 
 ; Commands errors
+cmdInfo_error:      db      "'info' command requires an option.", 13, 10, 'Try help info for a list of options.', 13, 10, 0
+
+; Help messages
+msgHelp_main:
+    db "HELP -- Available commands:", 13, 10
+    db "- info <-v/-n>", 13, 10
+    db "- help [command]", 13, 10
+    db "- halt", 13, 10
+    db 0
+
+msgHelp_info:
+    db "INFO -- Available options:", 13, 10
+    db "1. -v : display the version of the system", 13, 10
+    db "2. -n : display the name of the system", 13, 10
+    db 0
+
+msgHelp_halt:
+    db "HALT -- Available options:", 13, 10
+    db "No option is available for now", 13, 10
+    db 0
+
+msgFileNotFound:
+    db "File not found", 13, 10, 0
+    
+msgDiskError:
+    db "Disk error", 13, 10, 0
+
+msgFileCreated:
+    db "File created", 13, 10, 0
+
+msgFileDeleted:
+    db "File deleted", 13, 10, 0
+
+msgFileRenamed:
+    db "File renamed", 13, 10, 0
+    
+=======
 cmdInfo_error:      db      "'info' command requires an option.", 13, 10, 'Try help info for a list of options.', 13, 10, 0
