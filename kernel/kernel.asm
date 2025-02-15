@@ -80,6 +80,12 @@ shell_begin:
 
     check_command cmdHalt, STRING_compare, command_halt
 
+    check_command cmdLs, STRING_compare, .command_ls
+    check_command cmdCat, STRING_compare, .command_cat
+    check_command cmdRm, STRING_compare, .command_rm
+    check_command cmdMv, STRING_compare, .command_mv
+    check_command cmdTouch, STRING_compare, .command_touch
+
     jmp .command_unknow
 
     .command_unknow:
@@ -111,6 +117,8 @@ shell_begin:
 %include "lib/string.asm"
 %include "lib/disk.asm"
 %include "lib/general.asm"
+%include "lib/filesystem.asm"
+
 
 %include "kernel/help.asm"
 %include "kernel/info.asm"
