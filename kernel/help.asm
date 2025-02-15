@@ -38,3 +38,14 @@ msgHelp_halt:
     db "HALT -- Available options:", 13, 10
     db "No option is available for now", 13, 10
     db 0
+
+msgFileNotFound:
+    db "File not found", 13, 10, 0
+msgDiskError:
+    db "Disk error", 13, 10, 0
+msgFileCreated:
+    db "File created", 13, 10, 0
+msgFileDeleted:
+    db "File deleted", 13, 10, 0
+msgFileRenamed:
+    db "File renamed", 13, 10, 0
