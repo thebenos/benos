@@ -134,6 +134,9 @@ keyPress:           db      "Press a key to continue...", 0
 prpBuffer:          times 256 db 0
 progNameBuffer:     times 11 db 0
 
+arg_buffer:        times 256 db 0
+arg_buffer2:       times 256 db 0
+
 lnsOnScreen:        db      0
 
 cmdUnknow:          db      "Unknow command.", 13, 10, 0
