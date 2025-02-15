@@ -94,27 +94,27 @@ shell_begin:
     jz shell_begin
 
     mov si, cmdUnknow
-    call STDIO_print
-    jmp shell_begin
+        call STDIO_print
+        jmp shell_begin
 
     .command_ls:
-        call FILESYSTEM_list
+        call FS_list_directory
         jmp shell_begin
 
     .command_cat:
-        call FILESYSTEM_read
+        call FS_read_file
         jmp shell_begin
 
     .command_rm:
-        call FILESYSTEM_delete
+        call FS_delete_file
         jmp shell_begin
 
     .command_mv:
-        call FILESYSTEM_move
+        call FS_rename_file
         jmp shell_begin
 
     .command_touch:
-        call FILESYSTEM_create
+        call FS_create_file
         jmp shell_begin
 
     .scrollup:
