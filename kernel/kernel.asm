@@ -141,6 +141,12 @@ cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
 
+cmdLs      db "ls", 0
+cmdCat     db "cat", 0
+cmdRm      db "rm", 0
+cmdMv      db "mv", 0
+cmdTouch   db "touch", 0
+
 ; Commands arguments
 cmdInfo_version:    db      "info -v", 0
 cmdInfo_name:       db      "info -n", 0
