@@ -89,27 +89,40 @@ shell_begin:
     jmp .command_unknow
 
     .command_unknow:
-    ; Handle unknow commands
-    ; Check if the command is empty
-        call STRING_length
-        cmp ax, 0
-        jz shell_begin
+    call STRING_length
+    cmp ax, 0
+    jz shell_begin
 
-    ; Check if the command contains something
-        mov si, cmdUnknow
-        call STDIO_print
+    mov si, cmdUnknow
+    call STDIO_print
+    jmp shell_begin
 
+    .command_ls:
+        call FILESYSTEM_list
         jmp shell_begin
 
-; Continue the prompt
-    jmp shell_begin
-.scrollup:
-; Scroll up the screen
-    mov al, 1
-    dec byte [lnsOnScreen]
-    call VIDEO_scrollup
-    
-    jmp shell_begin
+    .command_cat:
+        call FILESYSTEM_read
+        jmp shell_begin
+
+    .command_rm:
+        call FILESYSTEM_delete
+        jmp shell_begin
+
+    .command_mv:
+        call FILESYSTEM_move
+        jmp shell_begin
+
+    .command_touch:
+        call FILESYSTEM_create
+        jmp shell_begin
+
+    .scrollup:
+        mov al, 1
+        dec byte [lnsOnScreen]
+        call VIDEO_scrollup
+        jmp shell_begin
+
 
 ; ----- INCLUDES -----
 %include "lib/stdio.asm"
