@@ -17,3 +17,37 @@ DISK_error:
     int 0x10
 
     jmp $
+
+DISK_read:
+    pusha
+    mov ah, 0x02
+    mov ch, 0
+    mov dh, 0
+    int 0x13
+    jc DISK_error
+    popa
+    ret
+
+DISK_write:
+    pusha
+    mov ah, 0x03
+    mov ch, 0
+    mov dh, 0
+    int 0x13
+    jc DISK_error
+    popa
+    ret
+
+DISK_read_file:
+    pusha
+    mov cx, 1
+    .read_loop:
+        push cx
+        call DISK_read
+        pop cx
+        inc cx
+        cmp cx, 10
+        jl .read_loop
+    popa
+    ret
+

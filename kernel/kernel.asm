@@ -80,30 +80,49 @@ shell_begin:
 
     check_command cmdHalt, STRING_compare, command_halt
 
+    check_command cmdLs, STRING_compare, .command_ls
+    check_command cmdCat, STRING_compare, .command_cat
+    check_command cmdRm, STRING_compare, .command_rm
+    check_command cmdMv, STRING_compare, .command_mv
+    check_command cmdTouch, STRING_compare, .command_touch
+
     jmp .command_unknow
 
     .command_unknow:
-    ; Handle unknow commands
-    ; Check if the command is empty
-        call STRING_length
-        cmp ax, 0
-        jz shell_begin
+    call STRING_length
+    cmp ax, 0
+    jz shell_begin
 
-    ; Check if the command contains something
-        mov si, cmdUnknow
+    mov si, cmdUnknow
         call STDIO_print
-
         jmp shell_begin
 
-; Continue the prompt
-    jmp shell_begin
-.scrollup:
-; Scroll up the screen
-    mov al, 1
-    dec byte [lnsOnScreen]
-    call VIDEO_scrollup
-    
-    jmp shell_begin
+    .command_ls:
+        call FS_list_directory
+        jmp shell_begin
+
+    .command_cat:
+        call FS_read_file
+        jmp shell_begin
+
+    .command_rm:
+        call FS_delete_file
+        jmp shell_begin
+
+    .command_mv:
+        call FS_rename_file
+        jmp shell_begin
+
+    .command_touch:
+        call FS_create_file
+        jmp shell_begin
+
+    .scrollup:
+        mov al, 1
+        dec byte [lnsOnScreen]
+        call VIDEO_scrollup
+        jmp shell_begin
+
 
 ; ----- INCLUDES -----
 %include "lib/stdio.asm"
@@ -111,6 +130,8 @@ shell_begin:
 %include "lib/string.asm"
 %include "lib/disk.asm"
 %include "lib/general.asm"
+%include "lib/filesystem.asm"
+
 
 %include "kernel/help.asm"
 %include "kernel/info.asm"
@@ -126,12 +147,21 @@ keyPress:           db      "Press a key to continue...", 0
 prpBuffer:          times 256 db 0
 progNameBuffer:     times 11 db 0
 
+arg_buffer:        times 256 db 0
+arg_buffer2:       times 256 db 0
+
 lnsOnScreen:        db      0
 
 cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
+
+cmdLs      db "ls", 0
+cmdCat     db "cat", 0
+cmdRm      db "rm", 0
+cmdMv      db "mv", 0
+cmdTouch   db "touch", 0
 
 ; Commands arguments
 cmdInfo_version:    db      "info -v", 0
