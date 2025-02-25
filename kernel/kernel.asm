@@ -117,7 +117,6 @@ shell_begin:
 %include "kernel/help.asm"
 %include "kernel/info.asm"
 %include "kernel/halt.asm"
-%include "kernel/ls.asm"
 
 ; ----- DATA -----
 segInit:            db      "[OK] Segments initialized", 13, 10, 0
