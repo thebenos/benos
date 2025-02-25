@@ -80,6 +80,8 @@ shell_begin:
 
     check_command cmdHalt, STRING_compare, command_halt
 
+    check_command cmdLs, STRING_compare, command_ls
+
     jmp .command_unknow
 
     .command_unknow:
@@ -115,6 +117,7 @@ shell_begin:
 %include "kernel/help.asm"
 %include "kernel/info.asm"
 %include "kernel/halt.asm"
+%include "kernel/ls.asm"
 
 ; ----- DATA -----
 segInit:            db      "[OK] Segments initialized", 13, 10, 0
@@ -132,6 +135,7 @@ cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
+cmdLs:              db      "ls", 0
 
 ; Commands arguments
 cmdInfo_version:    db      "info -v", 0
@@ -142,3 +146,5 @@ cmdHelp_halt        db      "help halt", 0
 
 ; Commands errors
 cmdInfo_error:      db      "'info' command requires an option.", 13, 10, 'Try help info for a list of options.', 13, 10, 0
+
+root_dir_buffer:    times 224 * 32 db 0

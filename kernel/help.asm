@@ -30,11 +30,13 @@ msgHelp_main:
 
 msgHelp_info:
     db "INFO -- Available options:", 13, 10
+    db "Description: shows informations about the system", 13, 10
     db "1. -v : display the version of the system", 13, 10
     db "2. -n : display the name of the system", 13, 10
     db 0
 
 msgHelp_halt:
     db "HALT -- Available options:", 13, 10
+    db "Description: shutdowns the system", 13, 10
     db "No option is available for now", 13, 10
     db 0

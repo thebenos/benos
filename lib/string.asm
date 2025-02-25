@@ -76,7 +76,13 @@ STRING_tokenize:
 ; NOTE:
 ; The length of the string is in AX.
 STRING_length:
-    pusha
+    push ax
+    push bx
+    push cx
+    push dx
+    push si
+    push di
+
     mov cx, 0
 .begin:
     cmp byte [si], 0
@@ -88,7 +94,14 @@ STRING_length:
     jmp .begin
 .done:
     mov word [.counter], cx
-    popa
+
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    
     mov ax, word [.counter]
 
     ret

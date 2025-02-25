@@ -1,223 +1,146 @@
-; The BenOS Operating System bootloader
-;
-; Please note that unlike versions 0.0.3 and earlier, this bootloader
-; is no longer made from scratch but is based (as of version 0.0.4) on
-; the MikeOS bootloader.
-; Although a few pieces of code have been modified to match BenOS
-; expectations, the code overall remains the same.
-; ==================================================================
+BITS 16
 
+jmp short bootloader_start  
+nop   
 
-    BITS 16
-
-    jmp short bootloader_start  ; Jump past disk description section
-    nop             ; Pad out before disk description
-
-
-; ------------------------------------------------------------------
-; Disk description table, to make it a valid floppy
-; Note: some of these values are hard-coded in the source!
-; Values are those used by IBM for 1.44 MB, 3.5" diskette
-
-OEMLabel        db "BEN_BOOT"   ; Disk label
-BytesPerSector      dw 512      ; Bytes per sector
-SectorsPerCluster   db 1        ; Sectors per cluster
-ReservedForBoot     dw 1        ; Reserved sectors for boot record
-NumberOfFats        db 2        ; Number of copies of the FAT
-RootDirEntries      dw 224      ; Number of entries in root dir
-                    ; (224 * 32 = 7168 = 14 sectors to read)
-LogicalSectors      dw 2880     ; Number of logical sectors
-MediumByte      db 0F0h     ; Medium descriptor byte
-SectorsPerFat       dw 9        ; Sectors per FAT
-SectorsPerTrack     dw 18       ; Sectors per track (36/cylinder)
-Sides           dw 2        ; Number of sides/heads
-HiddenSectors       dd 0        ; Number of hidden sectors
-LargeSectors        dd 0        ; Number of LBA sectors
-DriveNo         dw 0        ; Drive No: 0
-Signature       db 41       ; Drive signature: 41 for floppy
-VolumeID        dd 00000000h    ; Volume ID: any number
-VolumeLabel     db "BENOS      "; Volume Label: any 11 chars
-FileSystem      db "FAT12   "   ; File system type: don't change!
-
-
-; ------------------------------------------------------------------
-; Main bootloader code
+OEMLabel            db "BEN_BOOT"   
+BytesPerSector      dw 512          
+SectorsPerCluster   db 1            
+ReservedForBoot     dw 1            
+NumberOfFats        db 2            
+RootDirEntries      dw 224          
+LogicalSectors      dw 2880         
+MediumByte          db 0F0h         
+SectorsPerFat       dw 9            
+SectorsPerTrack     dw 18           
+Sides               dw 2            
+HiddenSectors       dd 0            
+LargeSectors        dd 0            
+DriveNo             dw 0            
+Signature           db 41           
+VolumeID            dd 00000000h    
+VolumeLabel         db "BENOS      "
+FileSystem          db "FAT12   "   
 
 bootloader_start:
-    mov ax, 07C0h           ; Set up 4K of stack space above buffer
-    add ax, 544         ; 8k buffer = 512 paragraphs + 32 paragraphs (loader)
-    cli             ; Disable interrupts while changing stack
+    mov ax, 07C0h
+    add ax, 544
+    cli
     mov ss, ax
     mov sp, 4096
-    sti             ; Restore interrupts
-
-    mov ax, 07C0h           ; Set data segment to where we're loaded
+    sti
+    mov ax, 07C0h
     mov ds, ax
-
-    ; NOTE: A few early BIOSes are reported to improperly set DL
 
     cmp dl, 0
     je no_change
-    mov [bootdev], dl       ; Save boot device number
-    mov ah, 8           ; Get drive parameters
+    mov [bootdev], dl
+    mov ah, 8
     int 13h
     jc fatal_disk_error
-    and cx, 3Fh         ; Maximum sector number
-    mov [SectorsPerTrack], cx   ; Sector numbers start at 1
-    movzx dx, dh            ; Maximum head number
-    add dx, 1           ; Head numbers start at 0 - add 1 for total
+    and cx, 3Fh
+    mov [SectorsPerTrack], cx
+    movzx dx, dh
+    add dx, 1
     mov [Sides], dx
 
 no_change:
-    mov eax, 0          ; Needed for some older BIOSes
+    mov eax, 0
 
-
-; First, we need to load the root directory from the disk. Technical details:
-; Start of root = ReservedForBoot + NumberOfFats * SectorsPerFat = logical 19
-; Number of root = RootDirEntries * 32 bytes/entry / 512 bytes/sector = 14
-; Start of user data = (start of root) + (number of root) = logical 33
-
-floppy_ok:              ; Ready to read first block of data
-    mov ax, 19          ; Root dir starts at logical sector 19
+floppy_ok:
+    mov ax, 19
     call l2hts
-
-    mov si, buffer          ; Set ES:BX to point to our buffer (see end of code)
+    mov si, buffer
     mov bx, ds
     mov es, bx
     mov bx, si
+    mov ah, 2
+    mov al, 14
 
-    mov ah, 2           ; Params for int 13h: read floppy sectors
-    mov al, 14          ; And read 14 of them
-
-    pusha               ; Prepare to enter loop
-
-
-read_root_dir:
-    popa                ; In case registers are altered by int 13h
     pusha
 
-    stc             ; A few BIOSes do not set properly on error
-    int 13h             ; Read sectors using BIOS
-
-    jnc search_dir          ; If read went OK, skip ahead
-    call reset_floppy       ; Otherwise, reset floppy controller and try again
-    jnc read_root_dir       ; Floppy reset OK?
-
-    jmp reboot          ; If not, fatal double error
-
+read_root_dir:
+    popa
+    pusha
+    stc
+    int 13h
+    jnc search_dir
+    call reset_floppy
+    jnc read_root_dir
+    jmp reboot
 
 search_dir:
     popa
-
-    mov ax, ds          ; Root dir is now in [buffer]
-    mov es, ax          ; Set DI to this info
+    mov ax, ds
+    mov es, ax
     mov di, buffer
-
-    mov cx, word [RootDirEntries]   ; Search all (224) entries
-    mov ax, 0           ; Searching at offset 0
-
+    mov cx, word [RootDirEntries]
+    mov ax, 0
 
 next_root_entry:
-    xchg cx, dx         ; We use CX in the inner loop...
-
-    mov si, kern_filename       ; Start searching for kernel filename
+    xchg cx, dx
+    mov si, kern_filename
     mov cx, 11
     rep cmpsb
-    je found_file_to_load       ; Pointer DI will be at offset 11
-
-    add ax, 32          ; Bump searched entries by 1 (32 bytes per entry)
-
-    mov di, buffer          ; Point to next entry
+    je found_file_to_load
+    add ax, 32
+    mov di, buffer
     add di, ax
-
-    xchg dx, cx         ; Get the original CX back
+    xchg dx, cx
     loop next_root_entry
-
-    mov si, file_not_found      ; If kernel is not found, bail out
+    mov si, file_not_found
     call print_string
     jmp reboot
 
-
-found_file_to_load:         ; Fetch cluster and load FAT into RAM
-    mov ax, word [es:di+0Fh]    ; Offset 11 + 15 = 26, contains 1st cluster
+found_file_to_load:
+    mov ax, word [es:di+0Fh]
     mov word [cluster], ax
-
-    mov ax, 1           ; Sector 1 = first sector of first FAT
+    mov ax, 1
     call l2hts
-
-    mov di, buffer          ; ES:BX points to our buffer
+    mov di, buffer
     mov bx, di
-
-    mov ah, 2           ; int 13h params: read (FAT) sectors
-    mov al, 9           ; All 9 sectors of 1st FAT
-
-    pusha               ; Prepare to enter loop
-
-
-read_fat:
-    popa                ; In case registers are altered by int 13h
+    mov ah, 2
+    mov al, 9
     pusha
 
+read_fat:
+    popa
+    pusha
     stc
-    int 13h             ; Read sectors using the BIOS
+    int 13h
+    jnc read_fat_ok
+    call reset_floppy
+    jnc read_fat
+    jmp fatal_disk_error
 
-    jnc read_fat_ok         ; If read went OK, skip ahead
-    call reset_floppy       ; Otherwise, reset floppy controller and try again
-    jnc read_fat            ; Floppy reset OK?
-
-; ******************************************************************
 fatal_disk_error:
-; ******************************************************************
-    mov si, disk_error      ; If not, print error message and reboot
+    mov si, disk_error
     call print_string
-    jmp reboot          ; Fatal double error
-
+    jmp reboot
 
 read_fat_ok:
     popa
-
-    mov ax, 2000h           ; Segment where we'll load the kernel
+    mov ax, 2000h
     mov es, ax
     mov bx, 0
-
-    mov ah, 2           ; int 13h floppy read params
+    mov ah, 2
     mov al, 1
-
-    push ax             ; Save in case we (or int calls) lose it
-
-
-; Now we must load the FAT from the disk. Here's how we find out where it starts:
-; FAT cluster 0 = media descriptor = 0F0h
-; FAT cluster 1 = filler cluster = 0FFh
-; Cluster start = ((cluster number) - 2) * SectorsPerCluster + (start of user)
-;               = (cluster number) + 31
-
-load_file_sector:
-    mov ax, word [cluster]      ; Convert sector to logical
-    add ax, 31
-
-    call l2hts          ; Make appropriate params for int 13h
-
-    mov ax, 2000h           ; Set buffer past what we've already read
-    mov es, ax
-    mov bx, word [pointer]
-
-    pop ax              ; Save in case we (or int calls) lose it
     push ax
 
+load_file_sector:
+    mov ax, word [cluster]
+    add ax, 31
+    call l2hts
+    mov ax, 2000h
+    mov es, ax
+    mov bx, word [pointer]
+    pop ax
+    push ax
     stc
     int 13h
-
-    jnc calculate_next_cluster  ; If there's no error...
-
-    call reset_floppy       ; Otherwise, reset floppy and retry
+    jnc calculate_next_cluster
+    call reset_floppy
     jmp load_file_sector
-
-
-    ; In the FAT, cluster values are stored in 12 bits, so we have to
-    ; do a bit of maths to work out whether we're dealing with a byte
-    ; and 4 bits of the next byte -- or the last 4 bits of one byte
-    ; and then the subsequent byte!
 
 calculate_next_cluster:
     mov ax, [cluster]
@@ -225,70 +148,52 @@ calculate_next_cluster:
     mov bx, 3
     mul bx
     mov bx, 2
-    div bx              ; DX = [cluster] mod 2
+    div bx
     mov si, buffer
-    add si, ax          ; AX = word in FAT for the 12 bit entry
+    add si, ax
     mov ax, word [ds:si]
-
-    or dx, dx           ; If DX = 0 [cluster] is even; if DX = 1 then it's odd
-
-    jz even             ; If [cluster] is even, drop last 4 bits of word
-                    ; with next cluster; if odd, drop first 4 bits
+    or dx, dx
+    jz even
 
 odd:
-    shr ax, 4           ; Shift out first 4 bits (they belong to another entry)
+    shr ax, 4
     jmp short next_cluster_cont
 
-
 even:
-    and ax, 0FFFh           ; Mask out final 4 bits
-
+    and ax, 0FFFh
 
 next_cluster_cont:
-    mov word [cluster], ax      ; Store cluster
-
-    cmp ax, 0FF8h           ; FF8h = end of file marker in FAT12
+    mov word [cluster], ax
+    cmp ax, 0FF8h
     jae end
-
-    add word [pointer], 512     ; Increase buffer pointer 1 sector length
+    add word [pointer], 512
     jmp load_file_sector
 
-
-end:                    ; We've got the file to load!
-    pop ax              ; Clean up the stack (AX was pushed earlier)
-    mov dl, byte [bootdev]      ; Provide kernel with boot device info
-
-    jmp 2000h:0000h         ; Jump to entry point of loaded kernel!
-
-
-; ------------------------------------------------------------------
-; BOOTLOADER SUBROUTINES
+end:
+    pop ax
+    mov dl, byte [bootdev]
+    jmp 2000h:0000h
 
 reboot:
     mov ax, 0
-    int 16h             ; Wait for keystroke
+    int 16h
     mov ax, 0
-    int 19h             ; Reboot the system
+    int 19h
 
-
-print_string:               ; Output string in SI to screen
+print_string:
     pusha
-
-    mov ah, 0Eh         ; int 10h teletype function
-
+    mov ah, 0Eh
 .repeat:
-    lodsb               ; Get char from string
+    lodsb
     cmp al, 0
-    je .done            ; If char is zero, end of string
-    int 10h             ; Otherwise, print it
+    je .done
+    int 10h
     jmp short .repeat
-
 .done:
     popa
     ret
 
-
-reset_floppy:       ; IN: [bootdev] = boot device; OUT: carry set on error
+reset_floppy:
     push ax
     push dx
     mov ax, 0
@@ -299,56 +204,32 @@ reset_floppy:       ; IN: [bootdev] = boot device; OUT: carry set on error
     pop ax
     ret
 
-
-l2hts:          ; Calculate head, track and sector settings for int 13h
-            ; IN: logical sector in AX, OUT: correct registers for int 13h
+l2hts:
     push bx
     push ax
-
-    mov bx, ax          ; Save logical sector
-
-    mov dx, 0           ; First the sector
+    mov bx, ax
+    mov dx, 0
     div word [SectorsPerTrack]
-    add dl, 01h         ; Physical sectors start at 1
-    mov cl, dl          ; Sectors belong in CL for int 13h
+    add dl, 01h
+    mov cl, dl
     mov ax, bx
-
-    mov dx, 0           ; Now calculate the head
+    mov dx, 0
     div word [SectorsPerTrack]
     mov dx, 0
     div word [Sides]
-    mov dh, dl          ; Head/side
-    mov ch, al          ; Track
-
+    mov dh, dl
+    mov ch, al
     pop ax
     pop bx
-
-    mov dl, byte [bootdev]      ; Set correct device
-
+    mov dl, byte [bootdev]
     ret
 
-
-; ------------------------------------------------------------------
-; STRINGS AND VARIABLES
-
-    kern_filename   db "KERNEL  BIN"    ; kernel filename
-
-    disk_error  db "Floppy error! Press any key...", 0
-    file_not_found  db "KERNEL.BIN not found!", 0
-
-    bootdev     db 0    ; Boot device number
-    cluster     dw 0    ; Cluster of the file we want to load
-    pointer     dw 0    ; Pointer into Buffer, for loading kernel
-
-
-; ------------------------------------------------------------------
-; END OF BOOT SECTOR AND BUFFER START
-
-    times 510-($-$$) db 0   ; Pad remainder of boot sector with zeros
-    dw 0AA55h       ; Boot signature (DO NOT CHANGE!)
-
-
-buffer:             ; Disk buffer begins (8k after this, stack starts)
-
-
-; ==================================================================
+kern_filename   db "KERNEL  BIN"
+disk_error      db "Floppy error! Press any key...", 0
+file_not_found  db "KERNEL.BIN not found!", 0
+bootdev         db 0
+cluster         dw 0
+pointer         dw 0
+times 510-($-$$) db 0
+dw 0AA55h
+buffer:
