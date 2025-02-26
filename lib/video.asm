@@ -2,18 +2,12 @@
 
 [bits 16]
 
-VIDEOMEM                equ     0xb800
-
 ; Usage:
 ; call VIDEO_clear
 VIDEO_clear:
-    mov bx, VIDEOMEM
-    mov es, bx
-    mov al, ' '
-    xor di, di
-    mov cx, 2000
-    mov ax, 0x0720
-    rep stosw
+    mov ah, 0x00
+    mov al, 0x03
+    int 0x10
 
     ret
 
