@@ -47,8 +47,7 @@ wait_for_key:
 
     jmp wait_for_key
 .start_shell:
-    mov si, NEWLINE
-    times 2 call STDIO_print
+    call VIDEO_clear
 
     jmp shell_begin
 
@@ -81,6 +80,8 @@ shell_begin:
     check_command cmdHalt, STRING_compare, command_halt
 
     check_command cmdLs, STRING_compare, command_ls
+
+    check_command cmdClear, STRING_compare, command_clear
 
     jmp .command_unknow
 
@@ -117,6 +118,10 @@ shell_begin:
 %include "kernel/help.asm"
 %include "kernel/info.asm"
 %include "kernel/halt.asm"
+%include "kernel/ls.asm"
+%include "kernel/clear.asm"
+
+%include "fs/fat12.asm"
 
 ; ----- DATA -----
 segInit:            db      "[OK] Segments initialized", 13, 10, 0
@@ -135,10 +140,11 @@ cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
 cmdLs:              db      "ls", 0
+cmdClear:           db      "clear", 0
 
 ; Commands arguments
-cmdInfo_version:    db      "info -v", 0
-cmdInfo_name:       db      "info -n", 0
+cmdInfo_version:    db      "info -n", 0
+cmdInfo_name:       db      "info -v", 0
 
 cmdHelp_info        db      "help info", 0
 cmdHelp_halt        db      "help halt", 0

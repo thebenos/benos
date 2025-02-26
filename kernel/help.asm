@@ -6,6 +6,7 @@ command_help:
     call STDIO_print
 
     jmp shell_begin
+    
 command_help_info:
 ; Display a list of all the available options for the 'info' command
     mov si, msgHelp_info
@@ -38,5 +39,5 @@ msgHelp_info:
 msgHelp_halt:
     db "HALT -- Available options:", 13, 10
     db "Description: shutdowns the system", 13, 10
-    db "No option is available for now", 13, 10
+    db "No option available.", 13, 10
     db 0
