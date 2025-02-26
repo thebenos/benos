@@ -41,4 +41,4 @@ qemu-system-x86_64 -drive format=raw,file=benos
 ```
 
 ## Links
-Join our official Discord server: https://discord.gg/AJjmXgXy
+Join our official Discord server: https://discord.gg/9ZX5wemN
