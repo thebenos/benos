@@ -1,44 +1,89 @@
 # BenOS
-*A small free and open-source operating system.*
+
+*BenOS is a minimalist, 16-bit, free and open-source x86 operating-system.*
 
 ## What is BenOS?
-BenOS is a small, free and open-source operating system still in active development.
+BenOS is a minimalist, 16-bit, free and open-source x86 operating-system, still in active development.
 
 ## Why should you use BenOS?
-What a stupid question... you shouldn't lol!
-Explanation:
-BenOS does not have a lot of features for now, but I am working hard to improve it, and you can contribute [here](CONTRIBUTING.md)!
-But you can always try it and suggest improvements.
+Actually... you should not. But in a few versions, you will certainly be able to fully interact with the filesystem. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
+
+## Repository structure
+The BenOS repository contains two branches:
+- Main: the branch which contains the last finished version (recommended if you prefer stability)
+- Indev: the branch which contains the last version in development. This branch is more updated than *Main* but can have more bugs and problems. If you find some, please make an **Issue**!
 
 ## Build
-You have two ways to build BenOS:
-1. Automatic method
-2. Manual method
+This section contains informations about building the system.
+*NOTE: the Windows and MacOS sections need contribution**
 
-### The automatic method
-Just execute the following commands:
+### Linux
+#### Automatic method
+1. Clone this repository
+```bash
+git clone https://github.com/thebenos/benos
+```
+2. Install the required packages (example with APT)
+```bash
+# as root
+apt update && apt install nasm mtools
+```
+3. Go inside the BenOS directory
+```bash
+cd benos
+```
+4. Enable execution for `build.sh`
 ```bash
 chmod +x build.sh
+```
+5. Run `build.sh`
+```bash
 ./build.sh
 ```
-The binary files will be created in the `build` directory.
+6. A file named "benos.img" should have been created!
 
-### The manual method
-To build the OS manually, execute in order the following commands:
+#### Manual method
+1. Clone this repository
 ```bash
-mkdir build # Create the build directory
-nasm -f bin -o build/bootloader.bin boot/bootloader.asm # Compile the bootloader
-nasm -f bin -o build/kernel.bin kernel/kernel.asm # Compile the kernel
-cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880 # Create the disk image
+git clone https://github.com/thebenos/benos
+```
+2. Install the required packages (example with APT)
+```bash
+# as root
+apt update && apt install nasm mtools
+```
+3. Go inside the BenOS directory
+```bash
+cd benos
+```
+4. Create a build directory
+```bash
+mkdir build
+```
+5. Compile the bootloader and the kernel
+```bash
+nasm -f bin build/BOOT.BIN boot/boot.asm
+nasm -f bin build/KERNEL.BIN kernel/kernel.asm
+```
+6. Create the disk image and format it
+```bash
+mformat -f1440 -B build/BOOT.BIN -C -i benos.img
+mcopy -D o -i benos.img build/KERNEL.BIN ::/
 ```
 
-## Running the OS
-Finally, you can run BenOS with your favorite emulator! (or directly on an USB key but this is not recommended for now).
+7. A file named "benos.img" should have been created!
 
-Example with qemu:
+### Windows
+*Contribution needed here*
+### MacOS
+*Contribution needed here*
+
+## Run on an emulator
+This section teachs you how to run BenOS on an emulator named qemu.
 ```bash
-qemu-system-x86_64 -drive format=raw,file=benos
+qemu-system-x86_64 -drive format=raw,file=benos.img
 ```
+BenOS should run.
 
-## Links
-Join our official Discord server: https://discord.gg/9ZX5wemN
+## How to contribute?
+[You can contribute here!](CONTRIBUTING.md)
