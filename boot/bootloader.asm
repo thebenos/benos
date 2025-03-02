@@ -1,75 +1,85 @@
-; This file contains the bootloader of BenOS.
+; ======================================================================
+; bootloader.asm
 ;
-; It is used to start the system and load the kernel.
-; First, the segments are initialized.
-; Next, the filesystem (FAT12) is initialized too.
-; And finally, the kernel is loaded.
+; This file is the BenOS bootloader. It initializes real mode and loads
+; a second sector from the disk, by calling the subroutine boot16_load_
+; disk provided in 16/utils.asm.
+; In this second sector, the GDT defined in 16/gdt.asm is loaded and the
+; protected mode is enabled by calling the subroutine boot_enable_
+; protected_mode defined in 16/switch.asm.
+; For more informations about the included files, please read their doc
+; umentation.
 ;
-; At the end, the bootloader jumps to the kernel.
+; MIT License
+; ======================================================================
 
-%define BASE            0x1000      ; Kernel address
-%define KERNEL_SIZE     50          ; Number of sectors required for the kernel
+[bits 16]                       ; Real mode
+[org 0x7c00]                    ; Bootloader address
 
-[bits 16]
-[org 0x0]
+; Initialize the stack
+mov bp, 0x0500
+mov sp, bp
 
-start:
-    cli                         ; Cancel interruptions
-; Initialize segments
-    mov ax, 0x07c0
-    mov ds, ax
-    mov es, ax
-    mov ax, 0x8000
-    mov ss, ax
-    mov sp, 0xf000
+; Recover the boot drive
+mov byte [boot_drive], dl
 
-    mov si, segInit
-    call BOOT_UTILS_print
+; Print a message to tell the user that BenOS is booting
+mov bx, msg_boot
+call boot16_print
 
-; Recover boot unit
-    mov dl, [boot_driver]
+; Load the second sector
+mov bx, 0x0002
+mov cx, 0x0001
+mov dx, 0x7e00
+call boot16_load_sector
 
-    mov si, recBootUnit
-    call BOOT_UTILS_print
+; Enable the protected mode
+call boot_enable_protected_mode
 
-; Load the kernel
-    xor ax, ax
-    int 0x13
+; Infinity loop
+jmp $
 
-    push es
-    mov ax, BASE
-    mov es, ax
-    mov bx, 0
+; ---------- INCLUDES ----------
+%include "boot/16/utils.asm"
+%include "boot/16/gdt.asm"
+%include "boot/16/switch.asm"
 
-    mov ah, 2
-    mov al, KERNEL_SIZE
-    mov ch, 0
-    mov cl, 2
-    mov dh, 0
-    mov dl, [boot_driver]
-    int 0x13
-    pop es
+; ---------- DATA ----------
+; NOTE: Every label starting with "msg" contains a string with informations
+; to tell the user what is happening.
+msg_boot:      db      "[ OK ] Start booting", 13, 10, 0
 
-    mov si, krnReady
-    call BOOT_UTILS_print
+boot_drive:     db      0x80
 
-; Jump to the kernel
-    mov si, krnLoading
-    call BOOT_UTILS_print
+; Fill the boot sector
+times 510 - ($ - $$) db 0
+; Magic word
+dw 0xaa55
 
-    jmp BASE:0
+; Second sector previously loaded
+bs_extended:
+    ; Initialize the protected mode
+    protected_mode_start:
+        call boot32_clear                   ; Clear the screen
 
-; ----- INCLUDES -----
-%include "boot/utils.asm"
+        ; Print a message to tell the user that BenOS is now in protected
+        ; mode
+        mov esi, msg_protected_mode_enabled
+        call boot32_print
 
-; ----- DATA -----
-; Messages
-segInit:            db      "[OK] Segments initialized", 13, 10, 0
-recBootUnit:        db      "[OK] Recovered boot unit", 13, 10, 0
-krnReady:           db      "[OK] Kernel is ready", 13, 10, 0
-krnLoading:         db      "[-] Jumping to the kernel...", 13, 10, 0
+        ; Infinity loop
+        jmp $
 
-boot_driver:        db      0x80        ; Hard disk
+        ; ---------- INCLUDES ----------
+        %include "boot/32/utils.asm"
 
-times 510 - ($ -$$) db 0                ; Fill the bootsector
-dw 0xaa55                               ; Magic word
+        ; ---------- DATA ----------
+        msg_protected_mode_enabled:     db      "[ OK ] Protected mode enabled", 0
+
+        vga_start:      equ     0x000b8000
+        vga_extent:     equ     80 * 25 * 2
+        style_wb:       equ     0x0f
+        kernel_start:   equ     0x00100000
+
+    ; Fill the sector
+    times 512 - ($ - bs_extended) db 0
