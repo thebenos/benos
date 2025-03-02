@@ -1,12 +1,12 @@
 # BenOS
 
-*BenOS is a minimalist, 16-bit, free and open-source x86 operating-system.*
+*BenOS is a minimalist, 32-bit, free and open-source x86 operating-system.*
 
 ## What is BenOS?
-BenOS is a minimalist, 16-bit, free and open-source x86 operating-system, still in active development.
+BenOS is a minimalist, 32-bit, free and open-source x86 operating-system, still in active development.
 
 ## Why should you use BenOS?
-Actually... you should not. But in a few versions, you will certainly be able to fully interact with the filesystem. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
+Actually... you should not. But in a few versions, you will certainly be able to fully interact with the system. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
 
 ## Repository structure
 The BenOS repository contains two branches:
@@ -60,18 +60,17 @@ cd benos
 ```bash
 mkdir build
 ```
-5. Compile the bootloader and the kernel
+5. Compile the bootloader
 ```bash
-nasm -f bin build/BOOT.BIN boot/boot.asm
-nasm -f bin build/KERNEL.BIN kernel/kernel.asm
-```
-6. Create the disk image and format it
-```bash
-mformat -f1440 -B build/BOOT.BIN -C -i benos.img
-mcopy -D o -i benos.img build/KERNEL.BIN ::/
+nasm -f bin build/bootloader.bin boot/bootloader.asm
 ```
 
-7. A file named "benos.img" should have been created!
+6. Create the disk image
+```bash
+cat build/bootloader /dev/zero | dd of=benos bs=512 count=2880
+```
+
+7. A file named "benos" should have been created!
 
 ### Windows
 *Contribution needed here*
@@ -81,7 +80,7 @@ mcopy -D o -i benos.img build/KERNEL.BIN ::/
 ## Run on an emulator
 This section teachs you how to run BenOS on an emulator named qemu.
 ```bash
-qemu-system-x86_64 -drive format=raw,file=benos.img
+qemu-system-x86_64 -drive format=raw,file=benos
 ```
 BenOS should run.
 
