@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BenOS</title>
+        <link rel="stylesheet", href="style.css"/>
+    </head>
+
+    <body>
+        <div class="content">
+        <center>
+        <h1><u>Welcome on the BenOS website</u></h1>
+
+        <p>
+            BenOS is a small, minimalist, free and open-source 16-bit
+            operating system, designed to be compatible with old and
+            modern architectures. You can download the 10 last updates
+            below. If you want older versions, please refer to the
+            <a href="https://github.com/thebenos/benos" target="_blank">
+                BenOS GitHub repository
+            </a>.
+        </p>
+
+        <p>
+            <h3>Sections:</h3>
+        </p>
+        <p>
+            <ul>
+                <li><a href="#contrib">How to contribute?</a></li>
+                <li><a href="#download">Download BenOS</a></li>
+                <li><a href="#last-update">Last changes</a></li>
+            </ul>
+        </p>
+
+        <h2 id ="last-update">What's new?</h2>
+
+            <h3>Version 0.0.7</h3>
+            <p>
+                BenOS version 0.0.7 is out! In this version, the OS returns
+                in 16-bit. The small bugs of the 0.0.5 version are fixed. A
+                new option has been added to the <em>info</em> command: the
+                <em>-l</em> option, to display the BenOS license name.
+            </p>
+            <p>
+                A very basic filesystem base has been added too.
+            <p>
+                <b><u>How does it work?</u></b>
+            </p>
+            <p>
+                All the files are stored in a table, named File Table.
+                This table is loaded in RAM and takes 224 bytes (because
+                it contains 224 entries with a size of 1 byte). A free
+                entry is represented by 0x00, an occupied entry is rep
+                resented by 0x01, and an entry with a removed file is
+                represented by 0x02.
+            </p>
+            <p>
+                Finally, 3 new commands have been introduced to interact
+                with the filesystem: <em>ls</em>, <em>touch</em> and <em>
+                rm</em>.
+            </p>
+
+        <h2 id="download">Downloads</h2>
+
+        <p>
+            You can download the 10 last versions of BenOS below.
+        </p>
+
+        <ul>
+            <li><a href="images/benos-0.0.7" download="benos-0.0.7">Download BenOS version 0.0.7</a></li>
+            <li><a href="images/benos-0.0.6" download="benos-0.0.6">Download BenOS version 0.0.6</a></li>
+            <li><a href="images/benos-0.0.5" download="benos-0.0.5">Download BenOS version 0.0.5</a></li>
+            <li><a href="images/benos-0.0.4" download="benos-0.0.4">Download BenOS version 0.0.4</a></li>
+            <li><a href="images/benos-0.0.3" download="benos-0.0.3">Download BenOS version 0.0.3</a></li>
+            <li><a href="images/benos-0.0.2" download="benos-0.0.2">Download BenOS version 0.0.2</a></li>
+            <li><a href="images/benos-0.0.1" download="benos-0.0.1">Download BenOS version 0.0.1</a></li>
+            <li><a href="images/benos-0.0.0" download="benos-0.0.0">Download BenOS version 0.0.0</a></li>
+        </ul>
+
+            <h2 id="contrib">Contributing</h2>
+
+            <h4>What does "contributing" mean?</h4>
+            <p>
+                Contributing means making changes to the project to improve it. Of course, there is a
+                procedure to follow to keep everything in order.
+            </p>
+            <h4>Steps</h4>
+                <ul>
+                    <li>1. Fork the repository's main branch.</li>
+                    <li>2. Make your own changes, test, modify whatever you like, as long as you keep the license.</li>
+                    <li>3. Submit your version of the project to be merged with the main branch. You'll detail all the changes you've made in your message.</li>
+                </ul>
+
+                Thank you in advance for your contribution!
+            </p>
+
+        </div>
+        </center>
+    </body>
+</html>
