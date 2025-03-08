@@ -1,9 +1,9 @@
 # BenOS
 
-*BenOS is a minimalist, 32-bit, free and open-source x86 operating-system.*
+*BenOS is a minimalist, 16-bit, free and open-source x86 operating-system.*
 
 ## What is BenOS?
-BenOS is a minimalist, 32-bit, free and open-source x86 operating-system, still in active development.
+BenOS is a minimalist, 16-bit, free and open-source x86 operating-system, still in active development.
 
 ## Why should you use BenOS?
 Actually... you should not. But in a few versions, you will certainly be able to fully interact with the system. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
@@ -50,7 +50,7 @@ git clone https://github.com/thebenos/benos
 2. Install the required packages (example with APT)
 ```bash
 # as root
-apt update && apt install nasm mtools
+apt update && apt install nasm
 ```
 3. Go inside the BenOS directory
 ```bash
@@ -60,14 +60,15 @@ cd benos
 ```bash
 mkdir build
 ```
-5. Compile the bootloader
+5. Compile the bootloader and the kernel
 ```bash
 nasm -f bin build/bootloader.bin boot/bootloader.asm
+nasm -f bin build/kernel.bin kernel/kernel.asm
 ```
 
 6. Create the disk image
 ```bash
-cat build/bootloader /dev/zero | dd of=benos bs=512 count=2880
+cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880
 ```
 
 7. A file named "benos" should have been created!
