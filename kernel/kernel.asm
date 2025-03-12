@@ -1,6 +1,10 @@
 [bits 16]
 [org 0x0]
 
+jmp start
+%include "fs/utils.asm"
+%include "kernel/cmdmacro.asm"
+
 %macro check_command 3
     mov di, %1
     call %2
@@ -10,10 +14,10 @@
 
 start:
 ; Initialize segments
-    mov ax, 0x2000
+    mov ax, 0x1000
     mov ds, ax
     mov es, ax
-    mov ax, 0x1000
+    mov ax, 0x8000
     mov ss, ax
     xor sp, sp
 
@@ -69,19 +73,19 @@ shell_begin:
     je .scrollup
 
 ; Check commands
-    check_command cmdInfo, STRING_compare, command_info
-    check_command cmdInfo_version, STRING_compare, command_info_version
-    check_command cmdInfo_name, STRING_compare, command_info_name
+    check_command cmdInfo, STRING_compare_start, command_info
 
-    check_command cmdHelp, STRING_compare, command_help
-    check_command cmdHelp_info, STRING_compare, command_help_info
-    check_command cmdHelp_halt, STRING_compare, command_help_halt
+    check_command cmdHelp, STRING_compare_start, command_help
 
     check_command cmdHalt, STRING_compare, command_halt
 
+    check_command cmdClear, STRING_compare, command_clear
+
     check_command cmdLs, STRING_compare, command_ls
 
-    check_command cmdClear, STRING_compare, command_clear
+    check_command cmdTouch, STRING_compare, command_touch
+
+    check_command cmdRm, STRING_compare, command_rm
 
     jmp .command_unknow
 
@@ -109,19 +113,17 @@ shell_begin:
     jmp shell_begin
 
 ; ----- INCLUDES -----
-%include "lib/stdio.asm"
-%include "lib/video.asm"
-%include "lib/string.asm"
-%include "lib/disk.asm"
-%include "lib/general.asm"
+%include "benlib/stdio.asm"
+%include "benlib/video.asm"
+%include "benlib/string.asm"
+%include "benlib/disk.asm"
+%include "benlib/general.asm"
 
 %include "kernel/help.asm"
 %include "kernel/info.asm"
 %include "kernel/halt.asm"
-%include "kernel/ls.asm"
 %include "kernel/clear.asm"
-
-%include "fs/fat12.asm"
+%include "kernel/fscmd.asm"
 
 ; ----- DATA -----
 segInit:            db      "[OK] Segments initialized", 13, 10, 0
@@ -131,7 +133,6 @@ prtTitle:           db      " version ", 0
 keyPress:           db      "Press a key to continue...", 0
 
 prpBuffer:          times 256 db 0
-progNameBuffer:     times 11 db 0
 
 lnsOnScreen:        db      0
 
@@ -139,17 +140,7 @@ cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
 cmdHalt:            db      "halt", 0
-cmdLs:              db      "ls", 0
 cmdClear:           db      "clear", 0
-
-; Commands arguments
-cmdInfo_version:    db      "info -n", 0
-cmdInfo_name:       db      "info -v", 0
-
-cmdHelp_info        db      "help info", 0
-cmdHelp_halt        db      "help halt", 0
-
-; Commands errors
-cmdInfo_error:      db      "'info' command requires an option.", 13, 10, 'Try help info for a list of options.', 13, 10, 0
-
-root_dir_buffer:    times 224 * 32 db 0
+cmdLs:              db      "ls", 0
+cmdTouch:           db      "touch", 0
+cmdRm:              db      "rm", 0

@@ -26,4 +26,11 @@ BOOT_UTILS_disk_error:
     call BOOT_UTILS_print
     jmp $
 
-    .msg: db "[!] An error occured while operating on disk", 13, 10, 0
+    .msg: db "[ ERR ] An error occured while operating on disk", 13, 10, 0
+
+BOOT_UTILS_clear:
+    mov ah, 0x00
+    mov al, 0x03
+    int 0x10
+
+    ret
