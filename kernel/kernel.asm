@@ -83,9 +83,9 @@ shell_begin:
 
     check_command cmdLs, STRING_compare, command_ls
 
-    check_command cmdTouch, STRING_compare, command_touch
+    check_command cmdTouch, STRING_compare_start, command_touch
 
-    check_command cmdRm, STRING_compare, command_rm
+    check_command cmdRm, STRING_compare_start, command_rm
 
     jmp .command_unknow
 

@@ -22,61 +22,73 @@ DISK_error:
 ; call DISK_list_files
 DISK_list_files:
     push bx
+    push si
+
+    mov bx, 0
 
 .next_file:
-    cmp byte [fileTable + bx], MARK_FREE_ENTRY
+    cmp bx, FILE_TABLE_ENTRIES
     je .list_done
 
+    cmp byte [fileTable + bx], MARK_FREE_ENTRY
+    je .next_entry
+
     cmp byte [fileTable + bx], MARK_REMOVED_ENTRY
-    je .removed_file
+    je .next_entry
 
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
     je .found_file
 
-    inc bx
+    add bx, FILE_ENTRY_SIZE
 
     jmp .next_file
 
 .found_file:
-    mov si, .msg_found_file
+    mov si, .file_found
     call STDIO_print
 
     inc bx
-
     jmp .next_file
 
-.removed_file:
+.next_entry:
     inc bx
-
     jmp .next_file
 
 .list_done:
+    pop si
     pop bx
 
     ret
 
-.msg_found_file:        db      "File found.", 13, 10, 0
+.file_found:        db      "File found.", 13, 10, 0
 
+; Usage:
+; mov si, <filename>
+; call DISK_create_file
 DISK_create_file:
     push bx
+    push si
+
+    mov bx, 0
 
 .next_file:
+    cmp bx, FILE_TABLE_ENTRIES
+    je .no_free_entry_found
+
     cmp byte [fileTable + bx], MARK_FREE_ENTRY
     je .free_entry_found
 
     cmp byte [fileTable + bx], MARK_REMOVED_ENTRY
     je .free_entry_found
 
-    cmp byte [fileTable + bx], FILE_TABLE_ENTRIES
-    je .no_free_entry_found
-
-    inc bx
+    add bx, FILE_ENTRY_SIZE
 
     jmp .next_file
 
 .free_entry_found:
     mov byte [fileTable + bx], MARK_OCCUPIED_ENTRY
-
+    
+    pop si
     pop bx
 
     ret
@@ -85,11 +97,12 @@ DISK_create_file:
     mov si, .msg
     call STDIO_print
 
+    pop si
     pop bx
 
     ret
 
-.msg:       db      "No free entry found.", 13, 10, 0
+.msg:   db "No free entry found.", 13, 10, 0
 
 DISK_remove_file:
     push bx
@@ -98,7 +111,7 @@ DISK_remove_file:
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
     je .file_found
 
-    inc bx
+    add bx, FILE_ENTRY_SIZE
 
     jmp .next_file
 

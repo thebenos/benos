@@ -8,7 +8,7 @@
 set -e
 
 # Define the variables
-OS_VERSION="0.0.8 Indev 1"
+OS_VERSION="0.0.8 Indev 2"
 
 BUILD_DIR="build"
 

@@ -78,8 +78,8 @@ msgHelp_main:
     db "- halt", 13, 10
     db "- clear", 13, 10
     db "- ls", 13, 10
-    db "- touch", 13, 10
-    db "- rm", 13, 10
+    db "- touch <filename>", 13, 10
+    db "- rm <file>", 13, 10
     db 0
 
 msgHelp_info:
@@ -108,9 +108,11 @@ msgHelp_ls:
 msgHelp_touch:
     db "TOUCH -- informations:", 13, 10
     db "Description: create a new file. Display an error message if the file cannot be created", 13, 10
+    db "1. <filename>: the name of the file", 13, 10
     db 0
 
 msgHelp_rm:
     db "RM -- informations:", 13, 10
     db "Description: remove a file", 13, 10
+    db "1. <file>: the name of the file", 13, 10
     db 0
