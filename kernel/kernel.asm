@@ -126,8 +126,8 @@ shell_begin:
 %include "kernel/fscmd.asm"
 
 ; ----- DATA -----
-segInit:            db      "[OK] Segments initialized", 13, 10, 0
-krnLoaded:          db      "[OK] Kernel loaded successfully", 13, 10, 0
+segInit:            db      "[ OK ] Segments initialized", 13, 10, 0
+krnLoaded:          db      "[ OK ] Kernel loaded successfully", 13, 10, 0
 prompt:             db      "BenOS> ", 0
 prtTitle:           db      " version ", 0
 keyPress:           db      "Press a key to continue...", 0

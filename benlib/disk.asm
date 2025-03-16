@@ -22,6 +22,7 @@ DISK_error:
 ; call DISK_list_files
 DISK_list_files:
     push bx
+    push cx
     push si
 
     mov bx, 0
@@ -39,34 +40,56 @@ DISK_list_files:
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
     je .found_file
 
-    add bx, FILE_ENTRY_SIZE
-
+    add bx, FILE_NAME_SIZE
     jmp .next_file
 
 .found_file:
-    mov si, .file_found
+    push bx
+
+    mov cx, FILE_NAME_SIZE
+
+    lea si, [fileTable + bx + 1]
+    lea di, [.file_list_tmp]
+
+    .copy_name:
+        lodsb
+        stosb
+        loop .copy_name
+
+    lea si, [.file_list_tmp]
+    mov cx, FILE_NAME_SIZE
+
+    .print_name:
+        lodsb
+        int 0x10
+        loop .print_name
+
+    mov si, NEWLINE
     call STDIO_print
 
-    inc bx
-    jmp .next_file
+    pop bx
+
+    jmp .next_entry
 
 .next_entry:
-    inc bx
+    add bx, FILE_NAME_SIZE
     jmp .next_file
 
 .list_done:
     pop si
+    pop cx
     pop bx
 
     ret
 
-.file_found:        db      "File found.", 13, 10, 0
+.file_list_tmp:         times FILE_NAME_SIZE db 0
 
 ; Usage:
 ; mov si, <filename>
 ; call DISK_create_file
 DISK_create_file:
     push bx
+    push cx
     push si
 
     mov bx, 0
@@ -81,14 +104,23 @@ DISK_create_file:
     cmp byte [fileTable + bx], MARK_REMOVED_ENTRY
     je .free_entry_found
 
-    add bx, FILE_ENTRY_SIZE
-
+    add bx, FILE_NAME_SIZE
     jmp .next_file
 
 .free_entry_found:
     mov byte [fileTable + bx], MARK_OCCUPIED_ENTRY
-    
+
+    inc bx
+    mov cx, FILE_NAME_SIZE
+
+    .copy_name:
+        lodsb
+        mov byte [fileTable + bx], al
+        inc bx
+        loop .copy_name
+
     pop si
+    pop cx
     pop bx
 
     ret
@@ -98,6 +130,7 @@ DISK_create_file:
     call STDIO_print
 
     pop si
+    pop cx
     pop bx
 
     ret
@@ -106,18 +139,20 @@ DISK_create_file:
 
 DISK_remove_file:
     push bx
+    push si
 
 .next_file:
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
     je .file_found
 
-    add bx, FILE_ENTRY_SIZE
+    add bx, FILE_NAME_SIZE
 
     jmp .next_file
 
 .file_found:
     mov byte [fileTable + bx], MARK_REMOVED_ENTRY
 
+    pop si
     pop bx
 
     ret
