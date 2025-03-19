@@ -54,9 +54,6 @@ start:
     call BOOT_UTILS_print
 
 ; Jump to the kernel
-    mov si, krnLoading
-    call BOOT_UTILS_print
-
     jmp BASE:0
 
 ; ----- INCLUDES -----
@@ -64,10 +61,9 @@ start:
 
 ; ----- DATA -----
 ; Messages
-segInit:            db      "[OK] Segments initialized", 13, 10, 0
-recBootUnit:        db      "[OK] Recovered boot unit", 13, 10, 0
-krnReady:           db      "[OK] Kernel is ready", 13, 10, 0
-krnLoading:         db      "[-] Jumping to the kernel...", 13, 10, 0
+segInit:            db      "[ OK ] Segments initialized", 13, 10, 0
+recBootUnit:        db      "[ OK ] Recovered boot unit", 13, 10, 0
+krnReady:           db      "[ OK ] Kernel is ready", 13, 10, 0
 
 boot_driver:        db      0x80        ; Hard disk
 

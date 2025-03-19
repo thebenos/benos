@@ -3,6 +3,7 @@
 
 jmp start
 %include "fs/utils.asm"
+%include "kernel/cmdmacro.asm"
 
 %macro check_command 3
     mov di, %1
@@ -72,26 +73,19 @@ shell_begin:
     je .scrollup
 
 ; Check commands
-    check_command cmdInfo, STRING_compare, command_info
-    check_command cmdInfo_version, STRING_compare, command_info_version
-    check_command cmdInfo_name, STRING_compare, command_info_name
-    check_command cmdInfo_license, STRING_compare, command_info_license
+    check_command cmdInfo, STRING_compare_start, command_info
 
-    check_command cmdHelp, STRING_compare, command_help
-    check_command cmdHelp_info, STRING_compare, command_help_info
-    check_command cmdHelp_halt, STRING_compare, command_help_halt
-    check_command cmdHelp_clear, STRING_compare, command_help_clear
-    check_command cmdHelp_ls, STRING_compare, command_help_ls
-    check_command cmdHelp_touch, STRING_compare, command_help_touch
-    check_command cmdHelp_rm, STRING_compare, command_help_rm
+    check_command cmdHelp, STRING_compare_start, command_help
 
     check_command cmdHalt, STRING_compare, command_halt
 
     check_command cmdClear, STRING_compare, command_clear
 
     check_command cmdLs, STRING_compare, command_ls
-    check_command cmdTouch, STRING_compare, command_touch
-    check_command cmdRm, STRING_compare, command_rm
+
+    check_command cmdTouch, STRING_compare_start, command_touch
+
+    check_command cmdRm, STRING_compare_start, command_rm
 
     jmp .command_unknow
 
@@ -132,8 +126,8 @@ shell_begin:
 %include "kernel/fscmd.asm"
 
 ; ----- DATA -----
-segInit:            db      "[OK] Segments initialized", 13, 10, 0
-krnLoaded:          db      "[OK] Kernel loaded successfully", 13, 10, 0
+segInit:            db      "[ OK ] Segments initialized", 13, 10, 0
+krnLoaded:          db      "[ OK ] Kernel loaded successfully", 13, 10, 0
 prompt:             db      "BenOS> ", 0
 prtTitle:           db      " version ", 0
 keyPress:           db      "Press a key to continue...", 0
@@ -150,18 +144,3 @@ cmdClear:           db      "clear", 0
 cmdLs:              db      "ls", 0
 cmdTouch:           db      "touch", 0
 cmdRm:              db      "rm", 0
-
-; Commands arguments
-cmdInfo_version:    db      "info -v", 0
-cmdInfo_name:       db      "info -n", 0
-cmdInfo_license:    db      "info -l", 0
-
-cmdHelp_info:       db      "help info", 0
-cmdHelp_halt:       db      "help halt", 0
-cmdHelp_clear:      db      "help clear", 0
-cmdHelp_ls:         db      "help ls", 0
-cmdHelp_touch:      db      "help touch", 0
-cmdHelp_rm:         db      "help rm", 0
-
-; Commands errors
-cmdInfo_error:      db      "'info' command requires an option.", 13, 10, 'Type help info for a list of options.', 13, 10, 0
