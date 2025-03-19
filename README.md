@@ -6,7 +6,7 @@
 BenOS is a minimalist, 16-bit, free and open-source x86 operating-system, still in active development.
 
 ## Why should you use BenOS?
-Actually... you should not. But in a few versions, you will certainly be able to fully interact with the system. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
+Actually... you should not (as your main OS). Explaining: BenOS is not fully exploitable for now and is still in development. BenOS has not been tried on real hardware for now, so it is better to run in on an emulator.
 
 ## Repository structure
 The BenOS repository contains two branches:
@@ -68,7 +68,7 @@ nasm -f bin build/kernel.bin kernel/kernel.asm
 
 6. Create the disk image
 ```bash
-cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880
+cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880 #status=none if you don't want to see the progress
 ```
 
 7. A file named "benos" should have been created!

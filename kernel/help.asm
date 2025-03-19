@@ -1,11 +1,29 @@
 [bits 16]
 
 command_help:
-; Display a list of all the available commands
+    mov si, prpBuffer
+    mov di, cmdHelp
+    call STRING_compare
+    jc command_help_home
+
+    mov si, prpBuffer
+    call STRING_split
+
+    check_param param_info, command_help_info
+    check_param param_halt, command_help_halt
+    check_param param_clear, command_help_clear
+    check_param param_ls, command_help_ls
+    check_param param_touch, command_help_touch
+    check_param param_rm, command_help_rm
+
+    jmp shell_begin.command_unknow
+
+command_help_home:
     mov si, msgHelp_main
     call STDIO_print
 
     jmp shell_begin
+
 command_help_info:
 ; Display a list of all the Informations for the 'info' command
     mov si, msgHelp_info
@@ -44,6 +62,14 @@ command_help_rm:
 
     jmp shell_begin
 
+; Parameters
+param_info:             db              "info", 0
+param_halt:             db              "halt", 0
+param_clear:            db              "clear", 0
+param_ls:               db              "ls", 0
+param_touch:            db              "touch", 0
+param_rm:               db              "rm", 0
+
 ; Help messages
 msgHelp_main:
     db "HELP -- Available commands:", 13, 10
@@ -52,8 +78,8 @@ msgHelp_main:
     db "- halt", 13, 10
     db "- clear", 13, 10
     db "- ls", 13, 10
-    db "- touch", 13, 10
-    db "- rm", 13, 10
+    db "- touch <filename>", 13, 10
+    db "- rm <file>", 13, 10
     db 0
 
 msgHelp_info:
@@ -81,10 +107,12 @@ msgHelp_ls:
 
 msgHelp_touch:
     db "TOUCH -- informations:", 13, 10
-    db "Description: create a new file. Display an error message if the file cannot be created", 13, 10
+    db "Description: create a new file.", 13, 10
+    db "1. <filename>: the name of the file. The filename must have 12 characters", 13, 10
     db 0
 
 msgHelp_rm:
     db "RM -- informations:", 13, 10
     db "Description: remove a file", 13, 10
+    db "1. <file>: the name of the file", 13, 10
     db 0

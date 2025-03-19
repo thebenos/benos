@@ -35,37 +35,47 @@ STRING_compare:
     ret
 
 ; Usage:
-; mov al, <separator>
-; mov si, <string>
-; call STRING_tokenize
-;
-; NOTE:
-; The next token is in DI.
-STRING_tokenize:
+; mov di, <first_string>
+; mov si, <second_string>
+; call STRING_compare_start
+STRING_compare_start:
     push di
     push si
-.begin:
-    cmp byte [si], al           ; Matching separator?
-    je .token_found
 
-    cmp byte [si], 0            ; Null-character?
-    jz .done
+.begin:
+    mov al, [si]
+    mov bl, [di]
+    cmp al, ' '
+    je .equal
+    cmp al, 0
+    je .equal
+
+    cmp bl, ' '
+    je .equal
+    cmp bl, 0
+    je .equal
+
+    cmp al, bl
+    jne .not_equal
 
     inc si
+    inc di
 
     jmp .begin
-.token_found:
-    mov byte [si], 0
-    inc si
-    mov di, [si]
 
-    pop di
-    pop si
+.not_equal:
+    clc
 
-    ret
+    jmp .done
+
+.equal:
+    stc
+
+    jmp .done
+
 .done:
-    pop di
     pop si
+    pop di
 
     ret
 
@@ -95,27 +105,34 @@ STRING_length:
 .counter dw 0
 
 ; Usage:
-; mov di, <first_string>
-; mov si, <second_string>
-; call STRING_compare_start
-STRING_compare_start:
-.begin:
+; mov si, <string>
+; call STRING_split
+STRING_split:
+    push si
+
+    mov di, 0
+
+.find_space:
     mov al, [si]
-    mov bl, [di]
 
-    cmp bl, 0
-    je .equal
+    cmp al, 0
+    je .done
 
-    cmp al, bl
-    jne .not_equal
+    cmp al, ' '
+    je .split
 
     inc si
-    inc di
-    jmp .begin
-.equal:
-    stc
+
+    jmp .find_space
+
+.split:
+    mov byte [si], 0
+    inc si
+    mov di, si
+
     jmp .done
-.not_equal:
-    clc
+
 .done:
+    pop si
+
     ret
