@@ -17,15 +17,15 @@ command_touch:
     mov si, di
     call STRING_length
     cmp ax, 12
-    jne .filename_too_short
+    jne .error_name
 
     mov si, di
     call DISK_create_file
 
     jmp shell_begin
 
-.filename_too_short:
-    mov si, .message_short
+.error_name:
+    mov si, .message_name
     call STDIO_print
 
     jmp shell_begin
@@ -37,7 +37,7 @@ command_touch:
     jmp shell_begin
 
 .message_error:         db          "No filename given", 13, 10, 0
-.message_short:         db          "Filename is too short", 13, 10, 0
+.message_name:          db          "Filename must have 12 characters", 13, 10, 0
 
 command_rm:
     mov si, prpBuffer
@@ -48,7 +48,19 @@ command_rm:
     mov si, prpBuffer
     call STRING_split
 
+    mov si, di
+    call STRING_length
+    cmp ax, 12
+    jne .error_name
+
+    mov si, di
     call DISK_remove_file
+
+    jmp shell_begin
+
+.error_name:
+    mov si, .message_name
+    call STDIO_print
 
     jmp shell_begin
 
@@ -58,4 +70,5 @@ command_rm:
 
     jmp shell_begin
 
-.message_error:         db          "Please provide a file to remove", 13, 10, 0
+.message_error:         db          "No filename given", 13, 10, 0
+.message_name:          db          "Filename must have 12 characters", 13, 10, 0

@@ -1,3 +1,13 @@
+; ===================================================================
+; utils.asm
+;
+; Released under MIT license (see LICENSE for more infos)
+;
+; This file contains every informations about the filesystem. These
+; informations are used in other parts of the system to interact with
+; the filesystem.
+; ===================================================================
+
 [bits 16]
 
 ; A file entry has a 13 bytes size: 12 bytes for the name and 1 byte for

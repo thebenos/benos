@@ -1,10 +1,26 @@
-[bits 16]
-[org 0x0]
+; ===================================================================
+; kernel.asm
+;
+; Released under MIT license (see LICENSE for more informations)
+;
+; This program is the BenOS kernel program. It is required for the
+; system to completely work. It initializes the segments and starts
+; the prompt.
+; ===================================================================
 
+; --------------- ASSEMBLER INFORMATIONS ---------------
+[bits 16]                       ; Real mode
+[org 0x0]                       ; Program origin
+; ------------------------------------------------------
+
+; Skip the includes below
 jmp start
 %include "fs/utils.asm"
 %include "kernel/cmdmacro.asm"
 
+; %1 -> command
+; %2 -> comparison subroutine
+; %3 -> action
 %macro check_command 3
     mov di, %1
     call %2
@@ -12,6 +28,7 @@ jmp start
     mov si, prpBuffer
 %endmacro
 
+; --------------- CODE ---------------
 start:
 ; Initialize segments
     mov ax, 0x1000
@@ -111,8 +128,9 @@ shell_begin:
     call VIDEO_scrollup
     
     jmp shell_begin
+; ------------------------------------
 
-; ----- INCLUDES -----
+; --------------- INCLUDES ---------------
 %include "benlib/stdio.asm"
 %include "benlib/video.asm"
 %include "benlib/string.asm"
@@ -124,18 +142,23 @@ shell_begin:
 %include "kernel/halt.asm"
 %include "kernel/clear.asm"
 %include "kernel/fscmd.asm"
+; ----------------------------------------
 
-; ----- DATA -----
+; --------------- DATA --------------------
+; Messages
 segInit:            db      "[ OK ] Segments initialized", 13, 10, 0
 krnLoaded:          db      "[ OK ] Kernel loaded successfully", 13, 10, 0
 prompt:             db      "BenOS> ", 0
 prtTitle:           db      " version ", 0
 keyPress:           db      "Press a key to continue...", 0
 
+; Buffers
 prpBuffer:          times 256 db 0
 
+; Other
 lnsOnScreen:        db      0
 
+; Command names
 cmdUnknow:          db      "Unknow command.", 13, 10, 0
 cmdInfo:            db      "info", 0
 cmdHelp:            db      "help", 0
@@ -144,3 +167,4 @@ cmdClear:           db      "clear", 0
 cmdLs:              db      "ls", 0
 cmdTouch:           db      "touch", 0
 cmdRm:              db      "rm", 0
+; -----------------------------------------

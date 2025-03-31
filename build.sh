@@ -8,15 +8,17 @@
 set -e
 
 # Define the variables
-OS_VERSION="0.0.8 Indev 3"
+OS_VERSION="0.0.9 Indev 1"
 
 BUILD_DIR="build"
 
 BOOTLOADER_FILE="boot/boot.asm"
 KERNEL_FILE="kernel/kernel.asm"
+ZEROES_FILE="boot/zeroes.asm"
 
 BOOTLOADER_BIN="$BUILD_DIR/boot.bin"
 KERNEL_BIN="$BUILD_DIR/kernel.bin"
+ZEROES_BIN="$BUILD_DIR/zeroes.bin"
 
 ASSEMBLER="nasm"
 FILES_FORMAT="bin"
@@ -41,9 +43,12 @@ $ASSEMBLER -f $FILES_FORMAT -o $BOOTLOADER_BIN $BOOTLOADER_FILE
 echo "Assembling $KERNEL_FILE -> $KERNEL_BIN..."
 $ASSEMBLER -f $FILES_FORMAT -o $KERNEL_BIN $KERNEL_FILE
 
+echo "Assembling $ZEROES_FILE -> $ZEROES_BIN..."
+$ASSEMBLER -f $FILES_FORMAT -o $ZEROES_BIN $ZEROES_FILE
+
 # Make the BenOS image
 echo "Creating OS image..."
-cat $BOOTLOADER_BIN $KERNEL_BIN | dd of=$IMAGE_FILE bs=512 count=2880 status=none
+cat $BOOTLOADER_BIN $KERNEL_BIN $ZEROES_BIN | dd of=$IMAGE_FILE bs=512 count=2880 status=none
 echo "Image created as $IMAGE_FILE"
 
 # Tell the user that the build is finished

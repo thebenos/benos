@@ -107,8 +107,8 @@ msgHelp_ls:
 
 msgHelp_touch:
     db "TOUCH -- informations:", 13, 10
-    db "Description: create a new file. Display an error message if the file cannot be created", 13, 10
-    db "1. <filename>: the name of the file", 13, 10
+    db "Description: create a new file.", 13, 10
+    db "1. <filename>: the name of the file. The filename must have 12 characters", 13, 10
     db 0
 
 msgHelp_rm:

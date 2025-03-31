@@ -1,10 +1,15 @@
-; This file is a light version of the standard BenOS library, containing
-; only the functions required for the bootloader, so as not to overload it
-; unnecessarily.
+; ===================================================================
+; utils.asm
+;
+; Released under MIT license (see LICENSE for more informations)
+;
+; This file is a light version of the Benlib. It only provides subrou
+; tines that are used in the bootloader. This file is only used in the
+; bootloader. Using it in another program would be stupid.
+; ===================================================================
 
-; Usage:
-; mov si, <string>
-; call BOOT_UTILS_print
+; Input:
+; SI -> string to print
 BOOT_UTILS_print:
     push si
     mov ah, 0x0e
@@ -18,9 +23,7 @@ BOOT_UTILS_print:
     pop si
     ret
 
-; Usage:
-; int 0x13
-; jc BOOT_UTILS_disk_error
+; Use with INT 0x13
 BOOT_UTILS_disk_error:
     mov si, .msg
     call BOOT_UTILS_print

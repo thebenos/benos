@@ -1,11 +1,19 @@
-; This file provides several functions used to manipulate strings.
+; ===================================================================
+; string.asm
+;
+; Released under MIT license (see LICENSE for more informations)
+;
+; This file is part of the Benlib. It provides several subroutines
+; that are used to work with strings.
+; ===================================================================
 
 [bits 16]
 
-; Usage:
-; mov di, <first_string>
-; mov si, <second_string>
-; call STRING_compare
+; Input:
+; DI -> first string
+; SI -> second string
+; Output:
+; CF -> result of the comparison
 STRING_compare:
     push di
     push si
@@ -34,10 +42,11 @@ STRING_compare:
 
     ret
 
-; Usage:
-; mov di, <first_string>
-; mov si, <second_string>
-; call STRING_compare_start
+; Input:
+; DI -> first string
+; SI -> second string
+; Output:
+; CF -> result of the comparison
 STRING_compare_start:
     push di
     push si
@@ -79,12 +88,10 @@ STRING_compare_start:
 
     ret
 
-; Usage:
-; mov si, <string>
-; call STRING_length
-;
-; NOTE:
-; The length of the string is in AX.
+; Input:
+; SI -> the string
+; Output:
+; AX -> the length of the string
 STRING_length:
     pusha
     mov cx, 0
@@ -104,9 +111,10 @@ STRING_length:
     ret
 .counter dw 0
 
-; Usage:
-; mov si, <string>
-; call STRING_split
+; Input:
+; SI -> the string to split
+; Output:
+; DI -> the second part of the string (if there is one)
 STRING_split:
     push si
 

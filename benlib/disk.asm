@@ -1,25 +1,26 @@
-; This file contains several subroutines used to interact with the disk
-; and the filesystem.
+; ===================================================================
+; disk.asm
 ;
-; IMPORTANT:
-; This file depends of "lib/stdio.asm", so you must include it in your
-; program too.
+; Released under MIT license (see LICENSE for more informations)
+;
+; This file is part of the Benlib. It contains several subroutines
+; that are used to interact with the disk and the filesystem. To use
+; it in your program, type the following code:
+;
+; %include "benlib/disk.asm"
+; ===================================================================
 
 [bits 16]
 
-; Usage:
-; int 0x13
-; jc DISK_error
+; Use it with INT 0x13
 DISK_error:
-    mov ah, 0x0e
-    
-    mov al, '!'
-    int 0x10
+    mov si, .msg
+    call STDIO_print
 
-    jmp $
+    hlt
 
-; Usage:
-; call DISK_list_files
+.msg:       db      "[ ERR ] An error occured while operating on disk", 13, 10, 0
+
 DISK_list_files:
     push bx
     push cx
@@ -84,9 +85,8 @@ DISK_list_files:
 
 .file_list_tmp:         times FILE_NAME_SIZE db 0
 
-; Usage:
-; mov si, <filename>
-; call DISK_create_file
+; Input:
+; SI -> name of the file to create
 DISK_create_file:
     push bx
     push cx
@@ -137,24 +137,63 @@ DISK_create_file:
 
 .msg:   db "No free entry found.", 13, 10, 0
 
+; Input:
+; SI -> name of the file to remove
 DISK_remove_file:
     push bx
+    push cx
     push si
+    push di
 
-.next_file:
+    mov cx, FILE_NAME_SIZE
+    lea di, [.file_name_tmp]
+.copy_filename:
+    mov al, [si]
+    mov [di], al
+    inc si
+    inc di
+    loop .copy_filename
+
+    mov bx, 0
+
+.search_entry:
+    cmp bx, FILE_TABLE_ENTRIES * FILE_ENTRY_SIZE
+    jae .file_not_found
+
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
-    je .file_found
+    jne .skip_entry
 
-    add bx, FILE_NAME_SIZE
+    lea si, [.file_name_tmp]
+    lea di, [fileTable + bx + 1]
+    mov cx, FILE_NAME_SIZE
 
-    jmp .next_file
+.compare_loop:
+    mov al, [si]
+    mov dl, [di]
+    cmp al, dl
+    jne .not_match
+    inc si
+    inc di
+    loop .compare_loop
 
-.file_found:
     mov byte [fileTable + bx], MARK_REMOVED_ENTRY
+    jmp .end
 
+.not_match:
+.skip_entry:
+    add bx, FILE_NAME_SIZE
+    jmp .search_entry
+
+.file_not_found:
+    mov si, .no_file
+    call STDIO_print
+
+.end:
+    pop di
     pop si
+    pop cx
     pop bx
-
     ret
 
-.msg:           db          "No file has been created.", 13, 10, 0
+.file_name_tmp: times FILE_NAME_SIZE db 0
+.no_file:       db "File not found", 13, 10, 0

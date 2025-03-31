@@ -1,21 +1,25 @@
-; This file contains several subroutines used for inputs/outputs in video
-; mode.
+; ===================================================================
+; stdio.asm
+;
+; Released under MIT license (see LICENSE for more informations)
+;
+; This file is part of the Benlib. It contains several subroutines
+; that are used to interact with the keyboard and the screen.
+; ===================================================================
 
 [bits 16]
 
-NEWLINE:         db      13, 10, 0
+NEWLINE:        db      13, 10, 0
 
-; Usage:
-; mov al, <char>
-; call STDIO_putchar
+; Input:
+; AL -> the character to print
 STDIO_putchar:
     mov ah, 0x0e
     int 0x10
     ret
 
-; Usage:
-; mov si, <string>
-; call STDIO_print
+; Input:
+; SI -> the string to print
 STDIO_print:
     push si
     mov ah, 0x0e
@@ -29,16 +33,13 @@ STDIO_print:
     pop si
     ret
 
-; Usage:
-; call STDIO_waitkeypress
 STDIO_waitkeypress:
     mov ah, 0x00
     int 0x16
     ret
 
-; Usage:
-; mov di, <buffer>
-; call STDIO_input
+; Input:
+; DI -> the buffer where to store the input
 STDIO_input:
     push di
     push si
