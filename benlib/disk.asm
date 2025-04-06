@@ -147,6 +147,7 @@ DISK_remove_file:
 
     mov cx, FILE_NAME_SIZE
     lea di, [.file_name_tmp]
+
 .copy_filename:
     mov al, [si]
     mov [di], al
@@ -157,7 +158,7 @@ DISK_remove_file:
     mov bx, 0
 
 .search_entry:
-    cmp bx, FILE_TABLE_ENTRIES * FILE_ENTRY_SIZE
+    cmp bx, FILE_TABLE_ENTRIES
     jae .file_not_found
 
     cmp byte [fileTable + bx], MARK_OCCUPIED_ENTRY
@@ -187,6 +188,7 @@ DISK_remove_file:
 .file_not_found:
     mov si, .no_file
     call STDIO_print
+    jmp .end
 
 .end:
     pop di
@@ -197,3 +199,4 @@ DISK_remove_file:
 
 .file_name_tmp: times FILE_NAME_SIZE db 0
 .no_file:       db "File not found", 13, 10, 0
+
