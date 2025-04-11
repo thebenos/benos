@@ -15,6 +15,7 @@ command_help:
     check_param param_ls, command_help_ls
     check_param param_touch, command_help_touch
     check_param param_rm, command_help_rm
+    check_param param_reboot, command_help_reboot
 
     jmp shell_begin.command_unknow
 
@@ -62,6 +63,12 @@ command_help_rm:
 
     jmp shell_begin
 
+command_help_reboot:
+    mov si, msgHelp_reboot
+    call STDIO_print
+
+    jmp shell_begin
+
 ; Parameters
 param_info:             db              "info", 0
 param_halt:             db              "halt", 0
@@ -69,6 +76,7 @@ param_clear:            db              "clear", 0
 param_ls:               db              "ls", 0
 param_touch:            db              "touch", 0
 param_rm:               db              "rm", 0
+param_reboot:           db              "reboot", 0
 
 ; Help messages
 msgHelp_main:
@@ -80,6 +88,7 @@ msgHelp_main:
     db "- ls", 13, 10
     db "- touch <filename>", 13, 10
     db "- rm <file>", 13, 10
+    db "- reboot", 13, 10
     db 0
 
 msgHelp_info:
@@ -115,4 +124,9 @@ msgHelp_rm:
     db "RM -- informations:", 13, 10
     db "Description: remove a file", 13, 10
     db "1. <file>: the name of the file", 13, 10
+    db 0
+
+msgHelp_reboot:
+    db "REBOOT -- informations:", 13, 10
+    db "Description: reboot the system. The system will stop if the reboot fails.", 13, 10
     db 0

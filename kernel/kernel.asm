@@ -104,6 +104,8 @@ shell_begin:
 
     check_command cmdRm, STRING_compare_start, command_rm
 
+    check_command cmdReboot, STRING_compare, command_reboot
+
     jmp .command_unknow
 
     .command_unknow:
@@ -167,4 +169,5 @@ cmdClear:           db      "clear", 0
 cmdLs:              db      "ls", 0
 cmdTouch:           db      "touch", 0
 cmdRm:              db      "rm", 0
+cmdReboot:          db      "reboot", 0
 ; -----------------------------------------

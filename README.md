@@ -11,7 +11,7 @@ Actually... you should not (as your main OS). Explaining: BenOS is not fully exp
 ## Repository structure
 The BenOS repository contains two branches:
 - Main: the branch which contains the last finished version (recommended if you prefer stability)
-- Indev: the branch which contains the last version in development. This branch is more updated than *Main* but can have more bugs and problems. If you find some, please make an **Issue**!
+- Indev: the branch which contains the last version in development. This branch is more updated than *Main* but can have more bugs and problems. If you find some, please report an **Issue**!
 
 ## Build
 This section contains informations about building the system.
@@ -64,11 +64,12 @@ mkdir build
 ```bash
 nasm -f bin build/bootloader.bin boot/bootloader.asm
 nasm -f bin build/kernel.bin kernel/kernel.asm
+nasm -f bin build/zeroes.bin boot/zeroes.asm
 ```
 
 6. Create the disk image
 ```bash
-cat build/bootloader.bin build/kernel.bin /dev/zero | dd of=benos bs=512 count=2880 #status=none if you don't want to see the progress
+cat build/bootloader.bin build/kernel.bin build/zeroes.bin /dev/zero | dd of=benos bs=512 count=2880
 ```
 
 7. A file named "benos" should have been created!
