@@ -1,55 +1,37 @@
 #!/bin/bash
 
-# This ffile is used to automatically build BenOS. Please notice that you
-# need NASM and BASH to run it. If you are not using a Linux system, do not
-# use this file, it won't work.
+COMPILER_FLAGS="-m32 -ffreestanding -mno-red-zone -fno-pie -nostdlib -c"
 
-# Exit if there is an error
 set -e
 
-# Define the variables
-OS_VERSION="0.0.9 Indev 2"
+if [ -d build ]; then
+    rm -r build
+fi
+mkdir build
 
-BUILD_DIR="build"
-
-BOOTLOADER_FILE="boot/boot.asm"
-KERNEL_FILE="kernel/kernel.asm"
-ZEROES_FILE="boot/zeroes.asm"
-
-BOOTLOADER_BIN="$BUILD_DIR/boot.bin"
-KERNEL_BIN="$BUILD_DIR/kernel.bin"
-ZEROES_BIN="$BUILD_DIR/zeroes.bin"
-
-ASSEMBLER="nasm"
-FILES_FORMAT="bin"
-
-IMAGE_FILE="benos"
-
-# Tell the user that the build is starting
-echo "---------- Building BenOS version $OS_VERSION ----------"
-
-# Check if the build directory exists. If yes, then remove it.
-# (Re)create it next.
-if [ -d $BUILD_DIR ]; then
-    rm -r $BUILD_DIR
+if [ -f benos.iso ]; then
+    rm benos.iso
 fi
 
-mkdir $BUILD_DIR
+mkdir -p iso/boot/grub
 
-# Assemble the OS files
-echo "Assembling $BOOTLOADER_FILE -> $BOOTLOADER_BIN..."
-$ASSEMBLER -f $FILES_FORMAT -o $BOOTLOADER_BIN $BOOTLOADER_FILE
+nasm -f elf32 boot/boot.asm -o build/boot.o
+gcc $COMPILER_FLAGS kernel/tss.c -o build/tss.o
+gcc $COMPILER_FLAGS kernel/gdt.c -o build/gdt.o
+gcc $COMPILER_FLAGS kernel/main.c -o build/main.o
+gcc $COMPILER_FLAGS drivers/video.c -o build/video.o
+gcc $COMPILER_FLAGS drivers/pic/pic.c -o build/pic.o
+nasm -f elf32 drivers/pic/interrupt.asm -o build/ainterrupt.o
+gcc $COMPILER_FLAGS drivers/pic/interrupt.c -o build/cinterrupt.o
+gcc $COMPILER_FLAGS drivers/pic/idt.c -o build/idt.o
+gcc $COMPILER_FLAGS klibdef/stdio.c -o build/kstdio.o
+gcc $COMPILER_FLAGS klibdef/stdlib.c -o build/kstdlib.o
 
-echo "Assembling $KERNEL_FILE -> $KERNEL_BIN..."
-$ASSEMBLER -f $FILES_FORMAT -o $KERNEL_BIN $KERNEL_FILE
+ld -m elf_i386 -T kernel/link.ld -Ttext 0x1000 -o iso/boot/kernel.elf build/boot.o build/video.o \
+    build/ainterrupt.o build/cinterrupt.o build/idt.o build/pic.o build/kstdio.o build/kstdlib.o \
+    build/tss.o build/gdt.o build/main.o \
+    -z noexecstack
 
-echo "Assembling $ZEROES_FILE -> $ZEROES_BIN..."
-$ASSEMBLER -f $FILES_FORMAT -o $ZEROES_BIN $ZEROES_FILE
+cp grub.cfg iso/boot/grub/grub.cfg
 
-# Make the BenOS image
-echo "Creating OS image..."
-cat $BOOTLOADER_BIN $KERNEL_BIN $ZEROES_BIN | dd of=$IMAGE_FILE bs=512 count=2880 status=none
-echo "Image created as $IMAGE_FILE"
-
-# Tell the user that the build is finished
-echo "---------- Build finished ----------"
+grub-mkrescue -o benos.iso iso/
