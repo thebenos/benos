@@ -66,4 +66,4 @@ qemu-system-i386 -cdrom benos.iso
 ```
 
 ## How to contribute?
-If you want to contribute to the project, please read (the contribution guide)[CONTRIBUTING.md] first.
+If you want to contribute to the project, please read CONTRIBUTING.md first!
