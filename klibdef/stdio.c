@@ -37,3 +37,20 @@ void println(ubyte_t *string)
     print(string);
     put_char('\n');
 }
+
+void dump(ubyte_t *address, int n)
+{
+    byte_t c1, c2;
+    byte_t *tab = "0123456789abcdef";
+
+    while (n--)
+    {
+        c1 = tab[(*address & 0xf0) >> 4];
+        c2 = tab[*address & 0x0f];
+
+        address++;
+
+        put_char(c1);
+        put_char(c2);
+    }
+}

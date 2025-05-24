@@ -79,3 +79,25 @@ void ISR_keyboard(void)
         }
     }
 }
+
+void ISR_except_PF(void)
+{
+    udword_t faulting_address;
+    udword_t eip;
+
+    asm(
+        "movl 60(%%ebp), %%eax;"
+        "mov %%eax, %0;"
+        "mov %%cr2, %%eax;"
+        "mov %%eax, %1;"
+        : "=m"(eip), "=m"(faulting_address)
+        :
+    );
+
+    print("[ ERR ] Page fault at ");
+
+    dump((ubyte_t *) &faulting_address, 4);
+    dump((ubyte_t *) &eip, 4);
+
+    asm("hlt");
+}

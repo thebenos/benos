@@ -1,5 +1,7 @@
-extern ISR_default, ISR_clock, ISR_keyboard
-global _ASM_default, _ASM_irq0, _ASM_irq1
+%include "kernel/include/macro.inc"
+
+extern ISR_default, ISR_clock, ISR_keyboard, do_syscalls, ISR_except_PF
+global _ASM_default, _ASM_irq0, _ASM_irq1, _ASM_syscalls, _ASM_except_PF
 
 _ASM_default:
     call ISR_default
@@ -10,10 +12,14 @@ _ASM_default:
     iret
 
 _ASM_irq0:
+    SAVE_REGISTERS
+
     call ISR_clock
 
     mov al, 0x20
     out 0x20, al
+
+    LOAD_REGISTERS
 
     iret
 
@@ -22,5 +28,29 @@ _ASM_irq1:
 
     mov al, 0x20
     out 0x20, al
+
+    iret
+
+_ASM_syscalls:
+    SAVE_REGISTERS
+
+    push eax
+
+    call do_syscalls
+
+    pop eax
+
+    LOAD_REGISTERS
+
+    iret
+
+_ASM_except_PF:
+    SAVE_REGISTERS
+
+    call ISR_except_PF
+
+    LOAD_REGISTERS
+
+    add esp, 4
 
     iret

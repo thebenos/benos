@@ -3,6 +3,8 @@
 void _ASM_default(void);
 void _ASM_irq0(void);
 void _ASM_irq1(void);
+void _ASM_syscalls(void);
+void _ASM_except_PF(void);
 
 IDTR idtr;
 IDT_Descriptor idt[];
@@ -23,7 +25,9 @@ void init_IDT(void)
 
     init_IDT_descriptor(0x08, (udword_t) _ASM_irq0, INTERRUPT_GATE, &idt[32]);
     init_IDT_descriptor(0x08, (udword_t) _ASM_irq1, INTERRUPT_GATE, &idt[33]);
-
+    init_IDT_descriptor(0x08, (udword_t) _ASM_syscalls, 0xef00, &idt[48]);
+    init_IDT_descriptor(0x08, (udword_t) _ASM_except_PF, INTERRUPT_GATE, &idt[14]);
+    
     idtr.limit = IDT_SIZE * 8;
     idtr.base = IDT_BASE;
 
