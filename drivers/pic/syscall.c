@@ -1,4 +1,4 @@
-#include "include/syscall.h"
+#include <drivers/pic/include/syscall.h>
 
 void do_syscalls(int syscall_number)
 {

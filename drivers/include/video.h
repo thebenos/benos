@@ -1,7 +1,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "../../klibc/stdtype.h"
+#include <klibc/stdtype.h>
 
 #define VRAM_START              0xb8000
 #define VRAM_END                0xb8fff

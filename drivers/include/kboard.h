@@ -1,7 +1,7 @@
 #ifndef KBOARD_H
 #define KBOARD_H
 
-#include "../../klibc/stdtype.h"
+#include <klibc/stdtype.h>
 
 ubyte_t keyboard_map[] = {
     0x1B, 0x1B, 0x1B, 0x1B, /*      esc     (0x01)  */

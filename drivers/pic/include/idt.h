@@ -1,8 +1,8 @@
 #ifndef PIC_IDT_H
 #define PIC_IDT_H
 
-#include "../../../klibc/stdtype.h"
-#include "../../../klibc/stdlib.h"
+#include <klibc/stdtype.h>
+#include <klibc/stdlib.h>
 
 #define IDT_BASE            0x800
 #define IDT_SIZE            0xff

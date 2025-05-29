@@ -1,8 +1,8 @@
-#include "include/interrupt.h"
-#include "../../klibc/stdtype.h"
-#include "../../klibc/stdio.h"
-#include "../include/io.h"
-#include "../include/kboard.h"
+#include <drivers/pic/include/interrupt.h>
+#include <klibc/stdtype.h>
+#include <klibc/stdio.h>
+#include <drivers/include/io.h>
+#include <drivers/include/kboard.h>
 
 void ISR_default(void)
 {
@@ -97,6 +97,24 @@ void ISR_except_PF(void)
     print("[ ERR ] Page fault at ");
 
     dump((ubyte_t *) &faulting_address, 4);
+    dump((ubyte_t *) &eip, 4);
+
+    asm("hlt");
+}
+
+void ISR_except_GPF(void)
+{
+    udword_t eip;
+
+    asm(
+        "movl 60(%%ebp), %%eax;"
+        "mov %%eax, %0;"
+        : "=m"(eip)
+        :
+    );
+
+    println("[ ERR ] General protection fault. Debug infos below:");
+    print("        EIP: ");
     dump((ubyte_t *) &eip, 4);
 
     asm("hlt");

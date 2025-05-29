@@ -23,6 +23,9 @@ _start:
     mov eax, 0x00000080
     mov cr0, eax
 
+    mov ax, 0x18
+    mov ss, ax
+
     jmp kernel_start
 
     hlt

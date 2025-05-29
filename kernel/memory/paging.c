@@ -1,41 +1,16 @@
 #define __MEMORY__
 
-#include "../include/paging.h"
+#include <kernel/include/paging.h>
+#include <klibc/string.h>
 
 void init_memory(void)
 {
-        udword_t page_addr;
-        int i, pg;
-
-        for (pg = 0; pg < RAM_MAXPAGE / 8; pg++)
-                memory_bitmap[pg] = 0;
-
-        for (pg = PAGE(0x0); pg < PAGE(0x20000); pg++) 
-                set_page_frame_used(pg);
-
-        for (pg = PAGE(0xA0000); pg < PAGE(0x100000); pg++) 
-                set_page_frame_used(pg);
-
-        pd0 = (udword_t*) get_page_frame();
-        pt0 = (udword_t*) get_page_frame();
-
-        pd0[0] = (udword_t) pt0;
-        pd0[0] |= 3;
-        for (i = 1; i < 1024; i++)
-                pd0[i] = 0;
-
-        page_addr = 0;
-        for (pg = 0; pg < 1024; pg++) {
-                pt0[pg] = page_addr;
-                pt0[pg] |= 3;
-                page_addr += 4096;
-        }
-
-        asm("   mov %0, %%eax \n \
-                mov %%eax, %%cr3 \n \
-                mov %%cr0, %%eax \n \
-                or %1, %%eax \n \
-                mov %%eax, %%cr0"::"m"(pd0), "i"(PAGING_FLAG));
+    udword_t *page_dir = get_page_frame();
+    memory_set(page_dir, 0, 0x1000);
+    for (int page = 0; page < 0x1000 * 512; page++)
+    {
+        map_page(page_dir, page, page, 3);
+    }
 }
 
 byte_t *get_page_frame(void)
@@ -76,8 +51,27 @@ udword_t *pd_create_task1(void)
     pd[USER_OFFSET >> 22] = (udword_t) pt;
     pd[USER_OFFSET >> 22] |= 7;
 
-    pt[0] = USER_OFFSET;
-    pt[0] |= 7;
+    map_page(pd, USER_OFFSET, USER_OFFSET, FLAG_PAGE_PRESENT | FLAG_PAGE_RW | FLAG_PAGE_USER);
 
     return pd;
+}
+
+void map_page(udword_t *pagedir, udword_t physical_page, udword_t virtual_page, udword_t flags)
+{
+	udword_t directory_index = VADDRESS_PD_OFFSET(virtual_page);
+    udword_t table_index = VADDRESS_PT_OFFSET(virtual_page);
+    udword_t *page_table;
+
+    if (pagedir[directory_index] & FLAG_PAGE_PRESENT)
+        page_table = (udword_t *) (pagedir[directory_index] & 0xfffff000);
+    else
+    {
+        page_table = (udword_t *) get_page_frame();
+        for (int i = 0; i < 1024; i++) page_table[i] = 0;
+        pagedir[directory_index] = ((udword_t) page_table & 0xfffff000) | (flags & 0xfff) | FLAG_PAGE_PRESENT;
+    }
+
+    page_table[table_index] = (physical_page & 0xfffff000) | (flags & 0xfff) | FLAG_PAGE_PRESENT;
+
+    asm("invlpg (%0)" :: "r" (virtual_page) : "memory");
 }

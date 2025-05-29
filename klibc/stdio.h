@@ -1,8 +1,8 @@
 #ifndef BENLIBC_STDIO_H
 #define BENLIBC_STDIO_H
 
-#include "../drivers/include/video.h"
-#include "stdtype.h"
+#include <drivers/include/video.h>
+#include <klibc/stdtype.h>
 
 extern void put_char(ubyte_t character);
 extern void print(ubyte_t *string);

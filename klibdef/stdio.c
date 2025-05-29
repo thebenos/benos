@@ -1,4 +1,4 @@
-#include "../klibc/stdio.h"
+#include <klibc/stdio.h>
 
 extern const byte_t scancodes[];
 

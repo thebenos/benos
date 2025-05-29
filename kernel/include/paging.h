@@ -1,13 +1,18 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#include "../../klibc/stdtype.h"
+#include <klibc/stdtype.h>
 
 #define PAGING_FLAG             0x80000000
 #define PD0_ADDRESS             0x20000
 #define PT0_ADDRESS             0x21000
 #define USER_OFFSET             0x40000000
 #define USER_STACK              0xe0000000
+
+#define FLAG_PAGE_PRESENT       0x1
+#define FLAG_PAGE_RW            0x2
+#define FLAG_PAGE_USER          0x4
+#define FLAG_PAGE_DEFAULT       (FLAG_PAGE_PRESENT | FLAG_PAGE_RW)
 
 #define PAGE_SIZE               4096
 #define RAM_MAXPAGE             0x10000
@@ -57,6 +62,7 @@ typedef struct
 } __attribute__ ((packed)) PT_Entry;
 
 void init_memory(void);
+void map_page(udword_t *pagedir, udword_t physical_page, udword_t virtual_page, udword_t flags);
 
 byte_t *get_page_frame(void);
 

@@ -1,7 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
-#include "../../klibc/stdtype.h"
+#include <klibc/stdtype.h>
 
 #define CLI         asm("cli"::)
 #define STI         asm("sti"::)

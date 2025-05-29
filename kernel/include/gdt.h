@@ -1,9 +1,9 @@
 #ifndef GDT_H
 #define GDT_H
 
-#include "../../klibc/stdtype.h"
-#include "../../klibc/stdlib.h"
-#include "tss.h"
+#include <klibc/stdtype.h>
+#include <klibc/stdlib.h>
+#include <kernel/include/tss.h>
 
 #define GDT_BASE            0x0
 #define GDT_SIZE            0xff

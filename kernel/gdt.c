@@ -1,5 +1,5 @@
 #define __GDT__
-#include "include/gdt.h"
+#include <kernel/include/gdt.h>
 
 void init_GDT_descriptor(udword_t base, udword_t limit, ubyte_t access, ubyte_t other, GDT_Descriptor *descriptor)
 {

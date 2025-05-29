@@ -11,4 +11,6 @@ typedef unsigned short          uword_t;
 typedef unsigned int            udword_t;
 typedef unsigned long long      uqword_t;
 
+typedef unsigned int            size_t;
+
 #endif

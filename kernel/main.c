@@ -1,17 +1,24 @@
-#include "../klibc/stdio.h"
-#include "../klibc/stdlib.h"
-#include "include/gdt.h"
-#include "../drivers/pic/include/idt.h"
-#include "../drivers/include/io.h"
-#include "include/paging.h"
-#include "include/tss.h"
+#include <klibc/stdio.h>
+#include <klibc/stdlib.h>
+#include <kernel/include/gdt.h>
+#include <drivers/pic/include/idt.h>
+#include <kernel/include/paging.h>
+#include <kernel/include/tss.h>
+#include <drivers/include/io.h>
 
 int main(void);
 void init_PIC(void);
 
+void kernel_start(void)
+{
+    init_GDT();
+
+    main();
+}
+
 void task1(void)
 {
-        byte_t *msg = (byte_t *) (USER_OFFSET + 0x100);
+        char *msg = (char *) 0x40000100;
         msg[0] = 't';
         msg[1] = 'a';
         msg[2] = 's';
@@ -24,18 +31,6 @@ void task1(void)
 
         while (1);
         return;
-}
-
-void kernel_start(void)
-{
-    init_GDT();
-    asm(
-        "movw $0x18, %ax \n"
-        "movw %ax, %ss \n"
-        "movl $0x20000, %esp"
-    );
-
-    main();
 }
 
 int main(void)
@@ -53,19 +48,17 @@ int main(void)
     init_PIC();
     println("[ OK ] PIC configured");
 
-    init_memory();
-    println("[ OK ] Paging enabled");
-
-    STI;
-
     asm(
         "movw $0x38, %ax \n"
         "ltr %ax"
     );
     println("[ OK ] TR loaded");
 
+    init_memory();
+    println("[ OK ] Paging enabled");
+
     pd = pd_create_task1();
-    mem_copy((udword_t *) 0x100000, &task1, 100);
+    mem_copy((udword_t *) 0x1000, &task1, 100);
     println("[ OK ] Created new task: task1");
 
     println("[ OK ] Interrupts enabled");

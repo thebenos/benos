@@ -1,7 +1,7 @@
 #ifndef TSS_H
 #define TSS_H
 
-#include "../../klibc/stdtype.h"
+#include <klibc/stdtype.h>
 
 typedef struct
 {
