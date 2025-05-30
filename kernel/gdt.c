@@ -1,3 +1,4 @@
+#include "kernel/include/tss.h"
 #define __GDT__
 #include <kernel/include/gdt.h>
 
@@ -15,6 +16,11 @@ void init_GDT_descriptor(udword_t base, udword_t limit, ubyte_t access, ubyte_t 
 
 void init_GDT(void)
 {
+    default_tss.debug_flag = 0x00;
+    default_tss.io_map = 0x00;
+    default_tss.esp0 = 0x20000;
+    default_tss.ss0 = 0x18;
+
     init_GDT_descriptor(0x0, 0x0, 0x0, 0x0, &gdt_entries[0]);
     init_GDT_descriptor(0x0, 0xfffff, 0x9b, 0x0d, &gdt_entries[1]);
     init_GDT_descriptor(0x0, 0xfffff, 0x93, 0x0d, &gdt_entries[2]);
@@ -24,7 +30,7 @@ void init_GDT(void)
     init_GDT_descriptor(0x0, 0xfffff, 0xf3, 0x0d, &gdt_entries[5]);
     init_GDT_descriptor(0x0, 0x0, 0xf7, 0x0d, &gdt_entries[6]);
 
-    init_GDT_descriptor((udword_t)&default_tss, 0x67, 0xe9, 0x00, &gdt_entries[7]);
+    init_GDT_descriptor((udword_t) &default_tss, 0x67, 0xe9, 0x00, &gdt_entries[7]);
 
     gdtr.limit = GDT_SIZE * 8;
     gdtr.base = GDT_BASE;
@@ -34,11 +40,6 @@ void init_GDT(void)
     asm("lgdtl (gdtr)");
 
     asm(
-        "movw $0x38, %ax \n"
-        "ltr %ax"
-    );
-
-    asm(
         "movw $0x10, %ax \n"
         "movw %ax, %ds \n"
         "movw %ax, %es \n"
@@ -46,13 +47,5 @@ void init_GDT(void)
         "movw %ax, %gs \n"
         "ljmp $0x08, $next \n"
         "next :\n"
-    );
-
-    asm(
-        "movw %%ss, %0 \n"
-        "movl %%esp, %1"
-        : "=m" (default_tss.ss0),
-        "=m" (default_tss.esp0)
-        :
     );
 }

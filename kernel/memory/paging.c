@@ -1,3 +1,4 @@
+#include "klibc/stdtype.h"
 #define __MEMORY__
 
 #include <kernel/include/paging.h>
@@ -6,10 +7,10 @@
 void init_memory(void)
 {
     udword_t *page_dir = get_page_frame();
-    memory_set(page_dir, 0, 0x1000);
+    memory_set(page_dir, 0, 0x100000);
     for (int page = 0; page < 0x1000 * 512; page++)
     {
-        map_page(page_dir, page, page, 3);
+        map_page(page_dir, page*0x1000, page*0x1000, 3);
     }
 }
 
@@ -51,7 +52,7 @@ udword_t *pd_create_task1(void)
     pd[USER_OFFSET >> 22] = (udword_t) pt;
     pd[USER_OFFSET >> 22] |= 7;
 
-    map_page(pd, USER_OFFSET, USER_OFFSET, FLAG_PAGE_PRESENT | FLAG_PAGE_RW | FLAG_PAGE_USER);
+    map_page(pd, 0x100000, 0x100000, FLAG_PAGE_PRESENT | FLAG_PAGE_RW | FLAG_PAGE_USER);
 
     return pd;
 }

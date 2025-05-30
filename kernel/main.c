@@ -1,3 +1,4 @@
+#include "klibc/stdtype.h"
 #include <klibc/stdio.h>
 #include <klibc/stdlib.h>
 #include <kernel/include/gdt.h>
@@ -58,32 +59,31 @@ int main(void)
     println("[ OK ] Paging enabled");
 
     pd = pd_create_task1();
-    mem_copy((udword_t *) 0x1000, &task1, 100);
+    mem_copy((byte_t *) 0x100000, (byte_t *) &task1, 100);
     println("[ OK ] Created new task: task1");
 
     println("[ OK ] Interrupts enabled");
 
     println("       Switching to user task");
-    asm ("   cli \n \
+    asm ("  cli \n \
             movl $0x20000, %0 \n \
             movl %1, %%eax \n \
             movl %%eax, %%cr3 \n \
             push $0x33 \n \
-            push $0x40000F00 \n \
+            push $0x40000f00 \n \
             pushfl \n \
             popl %%eax \n \
             orl $0x200, %%eax \n \
-            and $0xFFFFBFFF, %%eax \n \
+            and $0xffffbfff, %%eax \n \
             push %%eax \n \
             push $0x23 \n \
-            push $0x40000000 \n \
+            push $0x40000f00 \n \
             movw $0x2B, %%ax \n \
             movw %%ax, %%ds \n \
             iret" : "=m"(default_tss.esp0) : "m"(pd));
 
-
-    println("[ ERR ] Critical error - halting system");
-    asm("hlt");
+      println("[ ERR ] Critical error - halting system");
+      asm("hlt");
 
     while (1);
 }
