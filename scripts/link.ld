@@ -1,32 +1,24 @@
-ENTRY(_start)
-
-PHDRS
-{
-    text PT_LOAD FLAGS(5);
-    data PT_LOAD FLAGS(6);
-}
+ENTRY(kernel_start)
 
 SECTIONS
 {
-    . = 1M;
+    . = 0x100000;
 
-    .text : ALIGN(4K) {
+    .text : {
         *(.multiboot2)
         *(.text*)
+    }
+
+    .rodata : {
         *(.rodata*)
-    } :text
+        *(.rodata.*)
+    }
 
-    .data : ALIGN(4K) {
+    .data : {
         *(.data*)
-    } :data
+    }
 
-    .bss : ALIGN(4K) {
+    .bss : {
         *(.bss*)
-        *(COMMON)
-    } :data
-
-    . = ALIGN(16);
-    stack_bottom = .;
-    . = . + 0x4000;
-    stack_top = .;
+    }
 }

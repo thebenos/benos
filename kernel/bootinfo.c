@@ -1,8 +1,5 @@
 #include <kernel/include/bootinfo.h>
 
-/*
-    This function will be used later
-*/
 void parse_mb2(uint64_t mb2_info_addr)
 {
     mb2_tag_t *tag = (mb2_tag_t *)(mb2_info_addr + 8);

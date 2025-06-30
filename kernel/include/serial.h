@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdarg.h>
 
 #define COM1                0x3f8
 
@@ -18,9 +19,9 @@
 
 void serial_init(void);
 int serial_ready(void);
-void serial_putchar(const char c);
+void serial_putchar(char c);
+char serial_getchar();
 void serial_writestr(const char *str);
-void serial_writehex(uint64_t value);
 
 static inline void outb(uint16_t port, uint8_t value)
 {

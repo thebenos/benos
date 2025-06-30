@@ -18,8 +18,8 @@ ASM="nasm"
 CC="gcc"
 LINKER="ld"
 
-CFLAGS="-I.. -Wall -Wextra -g -O2 -ffreestanding"
-LFLAGS="-nostdlib -T link.ld"
+CFLAGS="-I.. -Wall -Wextra -g -ffreestanding -nostdlib -mno-red-zone -fno-pie -fno-stack-protector -m64"
+LFLAGS="-T link.ld -z noexecstack"
 
 $ASM -f elf64 -o "$D_BUILD/bootstrap.o" "$D_BOOT/bootstrap.asm"
 

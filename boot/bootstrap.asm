@@ -14,10 +14,11 @@ header_end:
 
 section .text
     global _start
-    extern kernel_main, stack_top
-
+    extern kernel_main
+    
 _start:
-    mov rsp, stack_top
+    mov rsp, 0x90000
+
     call kernel_main
 
     cli

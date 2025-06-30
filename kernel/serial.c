@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <kernel/include/serial.h>
+#include <stdint.h>
 
 void serial_init(void)
 {
@@ -17,28 +18,23 @@ int serial_ready(void)
     return (inb(COM1 + SERIAL_LSR) & 0x20);
 }
 
-void serial_putchar(const char c)
+void serial_putchar(char c)
 {
     while (!serial_ready());
     outb(COM1, c);
 }
 
-/*
-NEED TO BE FIXED
-=========================
+char serial_getchar()
+{
+    while (!(inb(COM1 + SERIAL_LSR) & 0x01));
+    return inb(COM1 + SERIAL_DR);
+}
 
 void serial_writestr(const char *str)
 {
-    char c = str[0];
-    serial_putchar(c);
+    while (*str)
+    {
+        serial_putchar(*str);
+        str++;
+    }
 }
-
-void serial_writehex(uint64_t value)
-{
-    const char *hex = "0123456789ABCDEF";
-    serial_writestr("0x");
-
-    for (int i = (sizeof(uint64_t) * 2) - 1; i >= 0; i--)
-        serial_putchar(hex[(value >> (i * 4)) & 0xf]);
-}
-*/

@@ -15,13 +15,11 @@ Every stable versions (and unstable versions since the 0.0.9-Indev1) can be down
 
 ## Project structure
 If the repository structure looks simple, the project structure is more complex.
-- `boot/`: this directory contains all the files required for the system to boot (excepted the GRUB configuration file, which is in `iso/`)
-- `drivers/`: this directory contains all the kernel drivers (used in the klibc or directly in the kernel)
-- `iso/`: this directory is used to make `benos.iso`. It contains `grub.cfg`
-- `kernel/`: this directory contains all the files directly related to the kernel
-- `klibc/`: this directory contains **the headers** of the klibc
-- `klibdef/`: this directory contains **the source files** of the klibc
-- `build.sh`: this file is used to compile BenOS and make `benos.iso`
+- `boot/`: the bootstrap files
+- `config/`: the config files (such as `grub.cfg`)
+- `docs/`: the website code
+- `kernel/`: the kernel source code
+- `scripts/`: the scripts used to build BenOS and some other things
 
 ## Programming languages
 BenOS uses the following programming languages:
@@ -38,7 +36,6 @@ Building BenOS is a very simple process.
 - nasm
 - ld
 - grub-mkrescue
-- grub-efi
 
 ### Now we can build!
 1. Clone this repository:
