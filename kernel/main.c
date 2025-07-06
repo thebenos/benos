@@ -1,57 +1,44 @@
-#include "../klibc/stdio.h"
-#include "include/gdt.h"
-#include "../drivers/pic/include/idt.h"
-#include "../drivers/include/io.h"
-#include "include/tss.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <limine.h>
+#include <include/lib.h>
+#include <display/include/console.h>
 
-void init_PIC(void);
+__attribute__((used, section(".limine_requests")))
+static volatile LIMINE_BASE_REVISION(3);
 
-void task1()
+__attribute__((used, section(".limine_requests")))
+static volatile struct limine_framebuffer_request framebuffer_request = {
+    .id = LIMINE_FRAMEBUFFER_REQUEST,
+    .revision = 0
+};
+__attribute__((used, section(".limine_requests_start")))
+static volatile LIMINE_REQUESTS_START_MARKER;
+
+__attribute__((used, section(".limine_requests_end")))
+static volatile LIMINE_REQUESTS_END_MARKER;
+
+static void hcf(void)
 {
-    STI;
-    println("[ OK ] Switched to ring 3");
-    while (1);
-} __attribute__ ((noreturn))
+    for (;;) asm ("hlt");
+}
 
-void kernel_start(void)
+void kmain(void)
 {
-    init_cursor(&cursor, 0, 0, ' ', ' ');
-    println("[ OK ] Cursor initialized");
+    if (LIMINE_BASE_REVISION_SUPPORTED == false)
+        hcf();
 
-    init_IDT();
-    println("[ OK ] IDT loaded");
+    if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1)
+        hcf();
 
-    init_PIC();
-    println("[ OK ] PIC configured");
+    struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
+    framebuffer = fb->address;
+    scanline = fb->pitch;
 
-    init_GDT();
-    println("[ OK ] New GDT loaded");
+    for (int i = 0; i <= 28; i++)
+        console_writestr("Text lol\n", COLOR_RED, COLOR_BLACK);
+    console_writestr("Hello!\n", COLOR_YELLOW, COLOR_BLACK);
 
-    CLI;
-
-    asm(
-        "movw $0x18, %ax \n"
-        "movw %ax, %ss \n"
-        "movl $0x20000, %esp"
-    );
-
-    asm(
-        "cli \n"
-        "push $0x33 \n"
-        "push $0x30000 \n"
-        "pushfl \n"
-        "popl %%eax \n"
-        "orl $0x200, %%eax \n"
-        "push %%eax \n"
-        "push $0x23 \n"
-        "push $task1 \n"
-        "movl $0x20000, %0 \n"
-        "movw $0x2b, %%ax \n"
-        "movw %%ax, %%ds \n"
-        "iret"
-        : "=m" (default_tss.esp0)
-        :
-    );
-
-    while (1);
+    hcf();
 }
