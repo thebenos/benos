@@ -1,4 +1,7 @@
+#include "drivers/include/ps2.h"
 #include <drivers/include/pic.h>
+#include <drivers/include/kbd.h>
+#include <drivers/include/kbd.h>
 #include <display/include/colors.h>
 #include <display/include/console.h>
 #include <include/interrupts.h>
@@ -75,6 +78,15 @@ void isr_irq_pit(registers_t *regs)
 
 void isr_irq_keyboard(registers_t *regs)
 {
-    console_writestr("k\n", YELLOW, BLACK);
+    uint8_t scancode = inb(KBD_DATA);
+    // debug
+    console_writehex(scancode, GRAY, BLACK);
+    // enddebug
+    char c = kbd_scancode_to_char(scancode);
+    if (c != 0)
+    {
+        char str[2] = { c, '\0' };
+        console_writestr(str, GRAY, BLACK);
+    }
     pic_send_eoi(1);
 }

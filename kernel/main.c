@@ -1,3 +1,4 @@
+#include <drivers/include/timer.h>
 #include <display/include/colors.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -9,6 +10,7 @@
 #include <display/include/console.h>
 #include <asm/asm.h>
 #include <drivers/include/pic.h>
+#include <drivers/include/ps2.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -42,8 +44,12 @@ void kmain(void)
     console_writestr("[ OK ] Initialized IDT\n", WHITE, BLACK);
     pic_remap(0x20, 0x28);
     console_writestr("[ OK ] Remapped PIC to 0x20-0x2f\n", WHITE, BLACK);
+    pit_init(100);
+    console_writestr("[ OK ] PIT frequency set to 100 Hz\n", WHITE, BLACK);
     irq_clear_mask(0);
     irq_clear_mask(1);
+    ps2_controller_init();
+    console_writestr("[ OK ] Initialized 8042 PS/2 controller\n", WHITE, BLACK);
     STI;
 
     while (true) HLT;
