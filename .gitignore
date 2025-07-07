@@ -1,0 +1,7 @@
+.vscode/
+.cache/
+obj/
+bin/
+iso_root/
+*.iso
+compile_commands.json

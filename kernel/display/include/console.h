@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define PSF1_FONT_MAGIC         0x0436
 #define PSF_FONT_MAGIC          0x864ab572
@@ -10,16 +11,6 @@
 
 #define CONSOLE_WIDTH           80
 #define CONSOLE_HEIGHT          25
-
-#define COLOR_BLACK             0x00000000
-#define COLOR_WHITE             0x00ffffff
-#define COLOR_RED               0x00ff0000
-#define COLOR_YELLOW            0x00ffff00
-
-#define CHAR_NL                 '\n'
-#define CHAR_CR                 '\r'
-#define CHAR_BS                 '\b'
-#define CHAR_TAB                '\t'
 
 typedef struct
 {
@@ -49,6 +40,8 @@ typedef enum
 void console_advance_cursor();
 void console_putchar(unsigned short int c, int *cx, int *cy, uint32_t fg, uint32_t bg);
 void console_writestr(const char *s, uint32_t fg, uint32_t bg);
+void console_writehex(uint64_t n, uint32_t fg, uint32_t bg);
+void console_memdump(uint8_t *address, size_t length, uint32_t fg, uint32_t bg);
 void console_scroll(ScrollModes mode, int n, uint32_t bg);
 
 extern char _binary_kernel_res_zap_light16_psf_start;
@@ -57,6 +50,3 @@ extern char _binary_font_start[];
 
 extern uint8_t *framebuffer;
 extern uint32_t scanline;
-
-static int cursor_x = 0;
-static int cursor_y = 0;

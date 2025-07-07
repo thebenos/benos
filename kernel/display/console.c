@@ -1,7 +1,10 @@
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <display/include/console.h>
 #include <include/lib.h>
+#include <display/include/colors.h>
+#include <display/include/chars.h>
 
 extern char _binary_kernel_res_zap_light32_psf_start;
 extern char _binary_kernel_res_zap_light32_psf_end;
@@ -10,13 +13,16 @@ extern char _binary_font_start[];
 uint8_t *framebuffer = NULL;
 uint32_t scanline = 0;
 
+static int cursor_x = 0;
+static int cursor_y = 0;
+
 static void display_newline()
 {
     cursor_x = 0;
     cursor_y++;
     if (cursor_y >= CONSOLE_HEIGHT)
     {
-        console_scroll(SCROLLUP, 1, COLOR_BLACK);
+        console_scroll(SCROLLUP, 1, BLACK);
         cursor_y = CONSOLE_HEIGHT - 1;
     }
 }
@@ -108,6 +114,42 @@ void console_writestr(const char *s, uint32_t fg, uint32_t bg)
 {
     for (size_t i = 0; s[i] != '\0'; i++)
         console_putchar(s[i], &cursor_x, &cursor_y, fg, bg);
+}
+
+void console_writehex(uint64_t n, uint32_t fg, uint32_t bg)
+{
+    console_writestr("0x", fg, bg);
+
+    bool leading = true;
+    for (int i = 60; i >= 0; i -= 4)
+    {
+        uint8_t nibble = (n >> i) & 0xf;
+        if (nibble == 0 && leading && i == 0)
+            continue;
+        leading = false;
+
+        char c = (nibble < 10) ? ('0' + nibble) : ('a' + nibble - 10);
+        console_putchar(c, &cursor_x, &cursor_y, fg, bg);
+    }
+
+    if (leading)
+        console_putchar('0', &cursor_x, &cursor_y, fg, bg);
+}
+
+void console_memdump(uint8_t *address, size_t length, uint32_t fg, uint32_t bg)
+{
+    char c1, c2;
+    char *tab = "0123456789abcdef";
+
+    while (length--)
+    {
+        c1 = tab[(*address & 0xf0) >> 4];
+        c2 = tab[*address & 0x0f];
+        address++;
+
+        console_putchar(c1, &cursor_x, &cursor_y, fg, bg);
+        console_putchar(c2, &cursor_x, &cursor_y, fg, bg);
+    }
 }
 
 void console_scroll(ScrollModes mode, int n, uint32_t bg)
