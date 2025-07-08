@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #include <limine.h>
 #include <include/lib.h>
-#include <include/gdt.h>
-#include <include/idt.h>
+#include <cpu/include/gdt.h>
+#include <cpu/include/idt.h>
 #include <display/include/console.h>
 #include <asm/asm.h>
 #include <drivers/include/pic.h>

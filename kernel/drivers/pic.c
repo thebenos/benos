@@ -1,5 +1,5 @@
 #include <drivers/include/pic.h>
-#include <include/io.h>
+#include <cpu/include/io.h>
 #include <stdint.h>
 
 void pic_send_eoi(uint8_t irq)

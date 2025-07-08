@@ -1,6 +1,6 @@
 #include <drivers/include/kbd.h>
 #include <drivers/include/ps2.h>
-#include <include/io.h>
+#include <cpu/include/io.h>
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -1,0 +1,19 @@
+site_name: BenOS Documentation
+
+nav:
+- Home: index.md
+- Download: download.md
+- Contributing: contributing.md
+- License: license.md
+- CPU:
+  - GDT: cpu/gdt.md
+  - Interrupts: cpu/interrupts.md
+- Drivers:
+  - PS/2 keyboard: drivers/ps2kbd.md
+  - PIC: drivers/pic.md
+  - PIT: drivers/pit.md
+  - Keyboard: drivers/kbd.md
+- API:
+  - Console: api/console.md
+  - IO ports: api/io.md
+  - Kernel library: api/lib.md

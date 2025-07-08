@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <include/io.h>
+#include <cpu/include/io.h>
 
 #define PIC1                    0x20
 #define PIC2                    0xa0

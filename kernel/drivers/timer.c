@@ -1,5 +1,5 @@
 #include <drivers/include/timer.h>
-#include <include/io.h>
+#include <cpu/include/io.h>
 
 void pit_init(uint64_t frequency)
 {
