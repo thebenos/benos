@@ -3,5 +3,6 @@
 obj/
 bin/
 iso_root/
+site/
 *.iso
 compile_commands.json

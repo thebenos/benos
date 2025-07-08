@@ -17,3 +17,5 @@ nav:
   - Console: api/console.md
   - IO ports: api/io.md
   - Kernel library: api/lib.md
+- Memory:
+  - Memory management: memory/mem.md
