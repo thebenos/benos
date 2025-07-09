@@ -13,6 +13,7 @@
 #include <drivers/include/ps2.h>
 #include <memory/include/pmm.h>
 #include <memory/include/vmm.h>
+#include <memory/include/mm.h>
 
 __attribute__((used, section(".limine_requests")))
 static volatile LIMINE_BASE_REVISION(3);
@@ -59,7 +60,7 @@ void init_memory(void)
     }
 
     uint64_t frames = memory / FRAME_SIZE;
-    pmm_init(frames, (uint64_t)&_kernel_end);
+    pmm_init(frames, (uintptr_t)&_kernel_end);
 
     console_writestr("[ OK ] Initialized PMM\n", WHITE, BLACK);
 

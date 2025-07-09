@@ -24,7 +24,7 @@ typedef struct
     pt_entry_t entries[PAGE_ENTRIES];
 } __attribute__((aligned(PAGE_SIZE))) page_table_t;
 
-void vmm_idmap_range(uintptr_t start, size_t length, page_table_t *pml4);
+void vmm_idmap_range(page_table_t *pml4);
 void vmm_init();
 void vmm_map(uintptr_t vaddr, uintptr_t paddr, uint64_t flags);
 void vmm_unmap(uintptr_t vaddr);
