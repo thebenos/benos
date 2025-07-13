@@ -13,15 +13,10 @@ BenOS is a small, hand-written, free and open-source 64-bit operating system cur
 - ISO generation support
 
 ## Repository structure
-*Note: a branch marked as ⚠️ will maybe get removed or replaced soon.*
-
 This repository is very simple. It contains 3 branches:
 
 - Main (the last stable version)
-
-- Indev (the last unstable version) ⚠️
-
-- Tofix (broken/buggy code that needs fixes) ⚠️
+- gh-pages (the GitHub Pages branch)
 
 Every stable versions (and unstable versions since the 0.0.9-Indev1) can be downloaded as raw images (excepted after the 0.0.9-Indev2, which provides an ISO file) directly from the (releases)[https://github.com/thebenos/benos/releases].
 
@@ -63,7 +58,7 @@ chmod +x iso.sh
 Congratulations! `benos.iso` should appear in the root folder.
 
 ## How to run
-**BenOS has not been tested on *real hardware* yet!**
+**BenOS works on real hardware too!**
 
 You can run BenOS in an emulator. In this example, we will use `qemu` (from `scripts/`).
 ```bash
