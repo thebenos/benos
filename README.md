@@ -60,7 +60,7 @@ Congratulations! `benos.iso` should appear in the root folder.
 ## How to run
 **BenOS works on real hardware too!**
 
-You can run BenOS in an emulator. In this example, we will use `qemu` (from `scripts/`).
+You can run BenOS in an emulator. In this example, we will use `qemu`.
 ```bash
 qemu-system-x86_64 -m 512 -cdrom benos.iso -bios /usr/share/OVMF/OVMF_CODE.fd
 ```
