@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define FRAME_SIZE                  0x1000        // 4KiB per frame
+#define FRAME_SIZE                  0x1000
 
 void pmm_init(uint64_t mm_size, uintptr_t bitmap_base);
 uintptr_t pmm_alloc_frame();

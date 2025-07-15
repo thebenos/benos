@@ -43,6 +43,7 @@ void console_writestr(const char *s, uint32_t fg, uint32_t bg);
 void console_writehex(uint64_t n, uint32_t fg, uint32_t bg);
 void console_memdump(uint8_t *address, size_t length, uint32_t fg, uint32_t bg);
 void console_scroll(ScrollModes mode, int n, uint32_t bg);
+void console_clear(uint32_t bg);
 
 extern char _binary_kernel_res_zap_light16_psf_start;
 extern char _binary_kernel_res_zap_light16_psf_end;

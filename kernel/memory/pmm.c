@@ -1,3 +1,5 @@
+#include <display/include/console.h>
+#include <display/include/colors.h>
 #include <memory/include/mm.h>
 #include <memory/include/pmm.h>
 #include <include/lib.h>
@@ -45,17 +47,41 @@ uintptr_t pmm_alloc_frame()
 void pmm_free_frame(uintptr_t frame)
 {
     uint64_t frame_n = frame / FRAME_SIZE;
+    if (frame_n >= frames)
+    {
+        console_writestr("[ ERR ] Frame out of range\n", RED, BLACK);
+        return;
+    }
+
+    if (!bit_test(frame_n))
+    {
+        console_writestr("[ ERR ] Cannot free a frame more than once\n", RED, BLACK);
+        return;
+    }
+
     bit_clear(frame_n);
 }
 
 void pmm_mark_used(uintptr_t frame)
 {
     uint64_t frame_n  = frame / FRAME_SIZE;
+    if (frame_n >= frames)
+    {
+        console_writestr("[ ERR ] Frame out of range\n", RED, BLACK);
+        return;
+    }
+
     bit_set(frame_n);
 }
 
 void pmm_mark_free(uintptr_t frame)
 {
     uint64_t frame_n = frame / FRAME_SIZE;
+    if (frame_n >= frames)
+    {
+        console_writestr("[ ERR ] Frame out of range\n", RED, BLACK);
+        return;
+    }
+
     bit_clear(frame_n);
 }

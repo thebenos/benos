@@ -12,30 +12,11 @@
 #include <drivers/include/pic.h>
 #include <drivers/include/ps2.h>
 #include <memory/include/pmm.h>
-#include <memory/include/vmm.h>
 #include <memory/include/mm.h>
+#include <asm/asm.h>
+#include <include/boot.h>
 
-__attribute__((used, section(".limine_requests")))
-static volatile LIMINE_BASE_REVISION(3);
-
-__attribute__((used, section(".limine_requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST,
-    .revision = 0
-};
-__attribute__((used, section(".limine_requests")))
-static volatile struct limine_memmap_request memmap_request = {
-    .id = LIMINE_MEMMAP_REQUEST,
-    .revision = 0
-};
-
-__attribute__((used, section(".limine_requests_start")))
-static volatile LIMINE_REQUESTS_START_MARKER;
-
-__attribute__((used, section(".limine_requests_end")))
-static volatile LIMINE_REQUESTS_END_MARKER;
-
-extern uint8_t _kernel_end;
+extern uint8_t _kernel_start, _kernel_end;
 
 void init_interrupts(void)
 {
@@ -60,12 +41,18 @@ void init_memory(void)
     }
 
     uint64_t frames = memory / FRAME_SIZE;
+
+    uint64_t bitmap_frames_size = (frames + 7) / 8;
+    bitmap_frames_size = (bitmap_frames_size + FRAME_SIZE - 1) & ~(FRAME_SIZE - 1);
+
     pmm_init(frames, (uintptr_t)&_kernel_end);
-
     console_writestr("[ OK ] Initialized PMM\n", WHITE, BLACK);
-
-    vmm_init();
-    console_writestr("[ OK ] Initialized VMM\n", WHITE, BLACK);
+    
+    uint64_t cr0 = cr0_read();
+    if (cr0 & (1 << 31))
+        console_writestr("[ OK ] Paging already enabled\n", WHITE, BLACK);
+    else
+        console_writestr("[ ERR ] Paging not enabled\n", RED, BLACK);
 }
 
 void kmain(void)
@@ -74,9 +61,11 @@ void kmain(void)
         HLT;
 
     if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1)
-        HLT;
+        for (;;) HLT;
     if (memmap_request.response == NULL || memmap_request.response->entry_count < 1)
-        HLT;
+        for (;;) HLT;
+    if (hhdm_request.response == NULL || hhdm_request.response->offset == 0)
+        for (;;) HLT;
 
     struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
     framebuffer = fb->address;
@@ -89,6 +78,7 @@ void kmain(void)
     ps2_controller_init();
     console_writestr("[ OK ] Initialized 8042 PS/2 controller\n", WHITE, BLACK);
     init_memory();
+
     STI;
 
     while (true) HLT;

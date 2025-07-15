@@ -194,3 +194,21 @@ void console_scroll(ScrollModes mode, int n, uint32_t bg)
             break;
     }
 }
+
+void console_clear(uint32_t bg)
+{
+    int height_px = CONSOLE_HEIGHT * FONT_SIZE;
+    int width_px = CONSOLE_WIDTH * FONT_SIZE;
+
+        for (int y = 0; y < height_px; y++)
+        {
+            for (int x = 0; x < width_px; x++)
+            {
+                PIXEL *dst = (PIXEL*)(framebuffer + y * scanline + x * sizeof(PIXEL));
+                *dst = bg;
+            }
+        }
+
+    cursor_x = 0;
+    cursor_y = 0;
+}

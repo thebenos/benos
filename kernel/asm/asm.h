@@ -48,3 +48,8 @@ static inline void cr4_write(uint64_t val)
 {
     __asm__ volatile("mov %0, %%cr4" :: "r"(val));
 }
+
+static inline void invlpg(void *addr)
+{
+    __asm__ volatile("invlpg (%0)" :: "r"(addr) : "memory");
+}
